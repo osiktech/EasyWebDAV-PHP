@@ -4,6 +4,7 @@
  * 
  * Features: Secured Path, No Upload Limits, Modern UI
  * By Prince | https://github.com/Andeasw/EasyWebDAV-PHP
+ * UI Optimized Version
  */
 
 // ============================================================================
@@ -349,12 +350,13 @@ class DavHandler {
         $u = ['B','KB','MB','GB']; $i=0; while($b>=1024&&$i<3){$b/=1024;$i++;} return round($b,2).' '.$u[$i];
     }
 
-    // --- HTML UI ---
+    // --- HTML UI Optimized ---
     
     private function sendHtml() {
         if (headers_sent()) return;
         header('Content-Type: text/html; charset=utf-8');
         
+        // 获取文件列表并排序 (文件夹优先)
         $list = scandir($this->fsPath);
         usort($list, function($a, $b) {
             $ad = is_dir($this->fsPath . '/' . $a);
@@ -362,10 +364,17 @@ class DavHandler {
             return ($ad === $bd) ? strcasecmp($a, $b) : ($ad ? -1 : 1);
         });
 
+        // 生成面包屑导航
         $bc = []; $acc = '';
         foreach(array_filter(explode('/', $this->reqPath)) as $p) {
             $acc .= '/' . $p; $bc[] = ['n'=>$p, 'p'=>$this->baseUri . $acc];
         }
+
+        // SVG 图标定义
+        $iconFile = '<svg viewBox="0 0 24 24" class="svg-icon"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>';
+        $iconFolder = '<svg viewBox="0 0 24 24" class="svg-icon" style="fill:#FBC02D"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>';
+        $iconUp = '<svg viewBox="0 0 24 24" class="svg-icon"><path d="M11 9l1.42 1.42L8.83 14H18V4h2v12H8.83l3.59 3.58L11 21l-6-6 6-6z"/></svg>';
+        $iconUpload = '<svg viewBox="0 0 24 24" class="svg-icon" style="fill:white"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>';
         ?>
         <!DOCTYPE html>
         <html lang="en">
@@ -374,32 +383,144 @@ class DavHandler {
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <title>EasyWebDAV File Manager</title>
             <style>
-                :root { --p: #4a90e2; --bg: #f4f7f6; --w: #fff; --t: #333; --b: #e1e4e8; }
-                body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; color: var(--t); }
-                .container { max-width: 900px; margin: 30px auto; background: var(--w); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; min-height: 80vh; }
-                header { padding: 15px 20px; border-bottom: 1px solid var(--b); display: flex; align-items: center; justify-content: space-between; background: #fff; }
-                .crumbs a { text-decoration: none; color: var(--p); font-weight: 500; } 
-                .crumbs span { color: #999; margin: 0 5px; }
-                .toolbar { padding: 15px 20px; background: #fafbfc; border-bottom: 1px solid var(--b); display: flex; flex-wrap: wrap; gap: 10px; }
-                .btn { padding: 8px 16px; border: 1px solid var(--b); background: var(--w); border-radius: 4px; cursor: pointer; font-size: 14px; color: #555; text-decoration: none; display: inline-flex; align-items: center; transition: all 0.2s; }
-                .btn:hover { border-color: var(--p); color: var(--p); }
-                .btn-primary { background: var(--p); color: #fff; border-color: var(--p); }
-                .btn-primary:hover { background: #357abd; }
-                input[type="text"] { padding: 8px; border: 1px solid var(--b); border-radius: 4px; outline: none; }
-                input[type="text"]:focus { border-color: var(--p); }
-                .file-list { width: 100%; border-collapse: collapse; flex: 1; }
-                .file-list th { text-align: left; padding: 12px 20px; color: #888; font-weight: 500; font-size: 13px; border-bottom: 1px solid var(--b); }
-                .file-list td { padding: 12px 20px; border-bottom: 1px solid #f0f0f0; }
+                :root { 
+                    --primary: #3b82f6; 
+                    --primary-hover: #2563eb;
+                    --bg: #f3f4f6; 
+                    --card: #ffffff; 
+                    --text: #1f2937; 
+                    --text-light: #6b7280; 
+                    --border: #e5e7eb;
+                }
+                * { box-sizing: border-box; }
+                body { 
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+                    background: var(--bg); 
+                    margin: 0; 
+                    color: var(--text); 
+                    line-height: 1.5;
+                }
+                .container { 
+                    max-width: 1000px; 
+                    margin: 20px auto; 
+                    background: var(--card); 
+                    border-radius: 12px; 
+                    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); 
+                    overflow: hidden; 
+                    display: flex; 
+                    flex-direction: column; 
+                    min-height: 85vh; 
+                }
+                /* Header & Crumbs */
+                header { 
+                    padding: 16px 24px; 
+                    border-bottom: 1px solid var(--border); 
+                    background: #fff;
+                }
+                .crumbs { font-size: 15px; color: var(--text-light); display: flex; align-items: center; flex-wrap: wrap; }
+                .crumbs a { text-decoration: none; color: var(--primary); font-weight: 600; padding: 4px 8px; border-radius: 4px; transition: background 0.2s; } 
+                .crumbs a:hover { background: #eff6ff; }
+                .crumbs span { color: #d1d5db; margin: 0 4px; }
+                
+                /* Toolbar */
+                .toolbar { 
+                    padding: 16px 24px; 
+                    background: #f9fafb; 
+                    border-bottom: 1px solid var(--border); 
+                    display: flex; 
+                    flex-wrap: wrap; 
+                    gap: 12px; 
+                    align-items: center; 
+                }
+                .btn { 
+                    padding: 8px 16px; 
+                    border: 1px solid var(--border); 
+                    background: var(--card); 
+                    border-radius: 6px; 
+                    cursor: pointer; 
+                    font-size: 14px; 
+                    font-weight: 500;
+                    color: var(--text); 
+                    text-decoration: none; 
+                    display: inline-flex; 
+                    align-items: center; 
+                    justify-content: center;
+                    transition: all 0.2s; 
+                    height: 38px;
+                    white-space: nowrap;
+                }
+                .btn:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
+                .btn-primary { 
+                    background: var(--primary); 
+                    color: #fff; 
+                    border-color: var(--primary); 
+                    position: relative;
+                    overflow: hidden;
+                }
+                .btn-primary:hover { background: var(--primary-hover); color: #fff; }
+                .svg-icon { width: 20px; height: 20px; fill: currentColor; margin-right: 8px; flex-shrink: 0; }
+                
+                /* Forms */
+                .upload-form { display: inline-flex; margin: 0; }
+                .mkdir-form { display: inline-flex; gap: 8px; flex: 1; max-width: 300px; }
+                input[type="text"] { 
+                    padding: 8px 12px; 
+                    border: 1px solid var(--border); 
+                    border-radius: 6px; 
+                    outline: none; 
+                    font-size: 14px;
+                    flex: 1;
+                    min-width: 0; /* Prevents overflow */
+                }
+                input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+                
+                /* File List */
+                .table-responsive { overflow-x: auto; flex: 1; }
+                .file-list { width: 100%; border-collapse: collapse; min-width: 600px; }
+                .file-list th { 
+                    text-align: left; 
+                    padding: 12px 24px; 
+                    color: var(--text-light); 
+                    font-weight: 600; 
+                    font-size: 13px; 
+                    border-bottom: 1px solid var(--border); 
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    background: #fff;
+                }
+                .file-list td { padding: 14px 24px; border-bottom: 1px solid #f3f4f6; color: var(--text-light); font-size: 14px; }
                 .file-list tr:last-child td { border-bottom: none; }
-                .file-list tr:hover { background: #f9fbfd; }
-                .icon { margin-right: 8px; font-size: 16px; }
-                .name { text-decoration: none; color: #333; font-weight: 500; display: block; }
-                .name:hover { color: var(--p); }
-                .footer { padding: 15px; background: #fafbfc; border-top: 1px solid var(--b); display: flex; justify-content: center; align-items: center; gap: 8px; color: #888; font-size: 13px; }
-                .gh-link { display: inline-flex; align-items: center; opacity: 0.6; transition: opacity 0.2s; }
-                .gh-link:hover { opacity: 1; }
-                .gh-link svg { width: 20px; height: 20px; fill: #333; }
-                @media (max-width: 600px) { .container { margin: 0; border-radius: 0; box-shadow: none; min-height: 100vh; } .hide-mobile { display: none; } }
+                .file-list tr:hover { background: #f9fafb; }
+                
+                .name-cell { display: flex; align-items: center; }
+                .file-link { 
+                    text-decoration: none; 
+                    color: var(--text); 
+                    font-weight: 500; 
+                    display: block; 
+                    white-space: nowrap; 
+                    overflow: hidden; 
+                    text-overflow: ellipsis; 
+                    max-width: 300px;
+                }
+                .file-link:hover { color: var(--primary); }
+                
+                /* Footer */
+                .footer { padding: 16px; background: #f9fafb; border-top: 1px solid var(--border); display: flex; justify-content: center; align-items: center; gap: 8px; color: var(--text-light); font-size: 13px; }
+                .gh-link svg { width: 18px; height: 18px; fill: var(--text-light); transition: 0.2s; }
+                .gh-link:hover svg { fill: #000; }
+
+                /* Mobile */
+                @media (max-width: 768px) {
+                    .container { margin: 0; border-radius: 0; box-shadow: none; height: 100vh; }
+                    .file-list { min-width: 100%; }
+                    .hide-mobile { display: none; } 
+                    .file-link { max-width: 200px; }
+                    .mkdir-form { max-width: 100%; width: 100%; }
+                    .toolbar { flex-direction: column; align-items: stretch; }
+                    .btn { width: 100%; }
+                    .upload-form { width: 100%; }
+                }
             </style>
         </head>
         <body>
@@ -415,51 +536,63 @@ class DavHandler {
                 
                 <div class="toolbar">
                     <?php if($this->reqPath !== '/'): ?>
-                        <a href=".." class="btn">⬆ Up</a>
+                        <a href=".." class="btn" style="flex: 0 0 auto; width: auto;"><?php echo $iconUp; ?> Back</a>
                     <?php endif; ?>
                     
-                    <form method="post" enctype="multipart/form-data" style="display:inline-flex; gap:10px;">
-                        <label class="btn btn-primary">
-                            Upload File <input type="file" name="file" style="display:none" onchange="this.form.submit()">
+                    <form method="post" enctype="multipart/form-data" class="upload-form">
+                        <label class="btn btn-primary" style="width: 100%; cursor: pointer;">
+                            <?php echo $iconUpload; ?> Upload File
+                            <!-- accept="*" 显式允许所有文件类型 -->
+                            <input type="file" name="file" accept="*" style="display:none" onchange="this.form.submit()">
                         </label>
                     </form>
 
-                    <form method="post" style="display:inline-flex; gap:5px;">
-                        <input type="text" name="mkdir" placeholder="New Folder" required>
-                        <button class="btn">Create</button>
+                    <form method="post" class="mkdir-form">
+                        <input type="text" name="mkdir" placeholder="New Folder Name" required autocomplete="off">
+                        <button class="btn" style="width: auto;">Create</button>
                     </form>
                 </div>
 
-                <table class="file-list">
-                    <thead><tr><th>Name</th><th class="hide-mobile">Size</th><th class="hide-mobile">Date</th></tr></thead>
-                    <tbody>
-                        <?php foreach($list as $f): 
-                            if($this->isProtected($f)) continue;
-                            $p = $this->fsPath . '/' . $f;
-                            $isDir = is_dir($p);
-                            $href = $this->baseUri . rtrim($this->reqPath, '/') . '/' . rawurlencode($f);
-                        ?>
-                        <tr>
-                            <td>
-                                <a href="<?php echo $href; ?>" class="name">
-                                    <span class="icon"><?php echo $isDir ? '📁' : '📄'; ?></span>
-                                    <?php echo htmlspecialchars($f); ?>
-                                </a>
-                            </td>
-                            <td class="hide-mobile"><?php echo $isDir ? '-' : $this->fmt(filesize($p)); ?></td>
-                            <td class="hide-mobile"><?php echo date('Y-m-d H:i', filemtime($p)); ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                        <?php if(count($list) <= 2): ?>
-                            <tr><td colspan="3" style="text-align:center;color:#999;padding:30px;">Empty Directory</td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="file-list">
+                        <thead>
+                            <tr>
+                                <th style="width: 60%">Name</th>
+                                <th class="hide-mobile" style="width: 20%">Size</th>
+                                <th class="hide-mobile" style="width: 20%">Modified</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach($list as $f): 
+                                if($this->isProtected($f)) continue;
+                                $p = $this->fsPath . '/' . $f;
+                                $isDir = is_dir($p);
+                                $href = $this->baseUri . rtrim($this->reqPath, '/') . '/' . rawurlencode($f);
+                            ?>
+                            <tr>
+                                <td>
+                                    <div class="name-cell">
+                                        <?php echo $isDir ? $iconFolder : $iconFile; ?>
+                                        <a href="<?php echo $href; ?>" class="file-link" title="<?php echo htmlspecialchars($f); ?>">
+                                            <?php echo htmlspecialchars($f); ?>
+                                        </a>
+                                    </div>
+                                </td>
+                                <td class="hide-mobile"><?php echo $isDir ? '-' : $this->fmt(filesize($p)); ?></td>
+                                <td class="hide-mobile"><?php echo date('Y-m-d H:i', filemtime($p)); ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                            <?php if(count($list) <= 2): ?>
+                                <tr><td colspan="3" style="text-align:center;color:#999;padding:40px;">Directory is empty</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
 
                 <div class="footer">
-                    <span>EasyWebDAV &copy; <?php echo date('Y'); ?> By Prince</span>
+                    <span>EasyWebDAV &copy; <?php echo date('Y'); ?></span>
                     <a href="https://github.com/Andeasw/EasyWebDAV-PHP" target="_blank" class="gh-link" title="View on GitHub">
-                        <svg viewBox="0 0 98 96" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"/></svg>
+                        <svg viewBox="0 0 98 96"><path fill-rule="evenodd" clip-rule="evenodd" d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"/></svg>
                     </a>
                 </div>
             </div>
@@ -478,16 +611,16 @@ function echo_html_setup() {
         <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Setup</title>
         <style>
-            body { background: #f0f2f5; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: -apple-system, sans-serif; }
-            .box { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 320px; text-align: center; }
-            h2 { margin-top: 0; color: #333; }
-            input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; outline: none; transition: 0.2s; }
-            input:focus { border-color: #4a90e2; }
-            button { width: 100%; padding: 12px; background: #4a90e2; color: #fff; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; transition: 0.2s; }
-            button:hover { background: #357abd; }
-            .footer { margin-top: 20px; font-size: 12px; color: #999; display: flex; justify-content: center; align-items: center; gap: 6px; }
+            body { background: #f3f4f6; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: -apple-system, sans-serif; }
+            .box { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 100%; max-width: 320px; text-align: center; }
+            h2 { margin-top: 0; color: #1f2937; margin-bottom: 24px; }
+            input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; outline: none; transition: 0.2s; }
+            input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+            button { width: 100%; padding: 12px; background: #3b82f6; color: #fff; border: none; border-radius: 6px; font-size: 16px; font-weight: 500; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+            button:hover { background: #2563eb; }
+            .footer { margin-top: 24px; font-size: 12px; color: #9ca3af; display: flex; justify-content: center; align-items: center; gap: 6px; }
             .gh-link { opacity: 0.6; display: flex; } .gh-link:hover { opacity: 1; }
-            .gh-link svg { width: 16px; height: 16px; fill: #666; }
+            .gh-link svg { width: 16px; height: 16px; fill: #4b5563; }
         </style>
     </head>
     <body>
@@ -496,7 +629,7 @@ function echo_html_setup() {
             <form method="post">
                 <input type="text" name="u" placeholder="Set Username" required autocomplete="off">
                 <input type="password" name="p" placeholder="Set Password" required autocomplete="new-password">
-                <button type="submit">Install</button>
+                <button type="submit">Install Server</button>
             </form>
             <div class="footer">
                 By Prince 
