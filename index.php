@@ -23,6 +23,21 @@ if(!file_exists(S_PATH)) @mkdir(S_PATH,0755,true);
 if(!file_exists(S_PATH.'/.htaccess')) @file_put_contents(S_PATH.'/.htaccess',"Deny from all");
 if(!file_exists(ROOT.'/.htaccess')) @file_put_contents(ROOT.'/.htaccess',"Options -Indexes\nRewriteEngine On\nRewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]");
 
+// --- PUBLIC SHARE HANDLER (PRE-AUTH) ---
+if(isset($_GET['s'])){
+    $s=file_exists(SHARE_F)?include SHARE_F:[];
+    if(isset($s[$_GET['s']]) && file_exists($f=S_PATH.'/'.$s[$_GET['s']])){
+        $x=strtolower(pathinfo($f,4));
+        $m=['txt'=>'text/plain','html'=>'text/html','css'=>'text/css','js'=>'text/javascript','json'=>'application/json','jpg'=>'image/jpeg','png'=>'image/png','gif'=>'image/gif','mp4'=>'video/mp4','pdf'=>'application/pdf','zip'=>'application/zip'];
+        header('Content-Type: '.($m[$x]??'application/octet-stream'));
+        header('Content-Disposition: attachment; filename="'.basename($f).'"');
+        header('Content-Length: '.filesize($f));
+        readfile($f); exit;
+    }
+    http_response_code(404); die('Link Expired or Invalid');
+}
+
+// --- AUTHENTICATION ---
 if(!file_exists(AUTH_F)){
     if(!empty($_SERVER['PHP_AUTH_USER'])&&!empty($_SERVER['PHP_AUTH_PW'])){
         @file_put_contents(AUTH_F,"<?php return ".var_export(['u'=>$_SERVER['PHP_AUTH_USER'],'h'=>password_hash($_SERVER['PHP_AUTH_PW'],PASSWORD_DEFAULT)],true).";");
@@ -49,8 +64,7 @@ $dav=new Dav();
 if($_SERVER['REQUEST_METHOD']==='POST'){
     if(isset($_FILES['f'])||isset($_POST['md'])||isset($_POST['act'])||isset($_POST['s_act'])) $dav->handleBrowser();
     else $dav->serve();
-} elseif(isset($_GET['s'])) $dav->publicShare($_GET['s']);
-else $dav->serve();
+} else $dav->serve();
 
 class Dav {
     private $uri, $req, $path;
@@ -126,15 +140,6 @@ class Dav {
             }
         }
         $this->back();
-    }
-
-    public function publicShare($k){
-        $s=file_exists(SHARE_F)?include SHARE_F:[];
-        if(isset($s[$k])&&file_exists($f=S_PATH.'/'.$s[$k])){
-            header('Content-Type: '.$this->mime($f)); header('Content-Disposition: attachment; filename="'.basename($f).'"');
-            header('Content-Length: '.filesize($f)); readfile($f); exit;
-        }
-        http_response_code(404); die('Link Expired');
     }
 
     private function GET(){
@@ -233,7 +238,7 @@ td{padding:14px 26px;border-bottom:1px solid var(--bd);font-size:14px;vertical-a
 <header>
     <div class="nav"><a href="<?=$this->uri?>/"><?=T('home')?></a><?php foreach($bc as $b) echo ' / <a href="'.$b['u'].'">'.htmlspecialchars($b['n']).'</a>';?></div>
     <div style="display:flex;gap:12px;align-items:center">
-        <button class="tg" onclick="mode()"><svg class="float-icon" width="24" height="24" viewBox="0 0 24 24" fill="#FDB813"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/></svg></button>
+        <button class="tg" onclick="mode()"><svg class="float-icon" width="24" height="24" viewBox="0 0 24 24" fill="#FDB813"><path d="M12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10-4.48-10-10-10zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z" fill="#FFF7D6" opacity="0.3"/></svg></button>
         <div style="font-size:13px;font-weight:600"><a href="?l=cn" style="text-decoration:none;color:<?=$lang=='cn'?'var(--p)':'#a8a29e'?>">CN</a> <span style="color:#cbd5e1">|</span> <a href="?l=en" style="text-decoration:none;color:<?=$lang=='en'?'var(--p)':'#a8a29e'?>">EN</a></div>
     </div>
 </header>
