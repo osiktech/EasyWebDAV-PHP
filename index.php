@@ -87,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_FILES['file'])) $server->handleBrowserUpload();
     if (isset($_POST['mkdir'])) $server->handleBrowserMkdir();
+    if (isset($_POST['action'])) $server->handleBrowserAction();
     
     if (empty($_FILES) && empty($_POST)) $server->serve();
     else exit;
@@ -280,6 +281,7 @@ class DavHandler {
     private function doUnlock() { http_response_code(204); }
     private function doHead() { file_exists($this->fsPath) ? http_response_code(200) : http_response_code(404); }
     
+    // 浏览器操作处理
     public function handleBrowserUpload() {
         if (is_dir($this->fsPath) && $_FILES['file']['error'] == 0) {
             $n = basename($_FILES['file']['name']);
@@ -296,6 +298,57 @@ class DavHandler {
         header("Location: " . $_SERVER['REQUEST_URI']);
     }
 
+    public function handleBrowserAction() {
+        $action = $_POST['action'] ?? '';
+        $name = $_POST['name'] ?? '';
+        $newname = $_POST['newname'] ?? '';
+        $target = $_POST['target'] ?? '';
+        
+        if (!$name || $this->isProtected($name)) {
+            header("Location: " . $_SERVER['REQUEST_URI']);
+            return;
+        }
+
+        $currentPath = $this->fsPath;
+        $itemPath = $currentPath . DIRECTORY_SEPARATOR . $name;
+        
+        switch ($action) {
+            case 'rename':
+                if ($newname && !$this->isProtected($newname)) {
+                    $newPath = $currentPath . DIRECTORY_SEPARATOR . $newname;
+                    if (!file_exists($newPath)) {
+                        rename($itemPath, $newPath);
+                    }
+                }
+                break;
+                
+            case 'delete':
+                if (file_exists($itemPath) && $itemPath != STORAGE_PATH) {
+                    $this->rm($itemPath);
+                }
+                break;
+                
+            case 'copy':
+                if ($target && !$this->isProtected(basename($target))) {
+                    $targetPath = STORAGE_PATH . DIRECTORY_SEPARATOR . ltrim($target, '/');
+                    $this->cp($itemPath, $targetPath . DIRECTORY_SEPARATOR . $name);
+                }
+                break;
+                
+            case 'move':
+                if ($target && !$this->isProtected(basename($target))) {
+                    $targetPath = STORAGE_PATH . DIRECTORY_SEPARATOR . ltrim($target, '/');
+                    $newPath = $targetPath . DIRECTORY_SEPARATOR . $name;
+                    if (!file_exists($newPath)) {
+                        rename($itemPath, $newPath);
+                    }
+                }
+                break;
+        }
+        
+        header("Location: " . $_SERVER['REQUEST_URI']);
+    }
+
     private function isProtected($n) { return in_array($n, $this->protect); }
     
     private function rm($p) {
@@ -307,15 +360,18 @@ class DavHandler {
     
     private function cp($s, $d) {
         if (is_dir($s)) {
-            mkdir($d);
+            if (!file_exists($d)) mkdir($d, 0755, true);
             foreach(scandir($s) as $i) if ($i !== '.' && $i !== '..') $this->cp($s . DIRECTORY_SEPARATOR . $i, $d . DIRECTORY_SEPARATOR . $i);
-        } else copy($s, $d);
+        } else {
+            copy($s, $d);
+        }
     }
     
     private function fmt($b) {
         $u = ['B','KB','MB','GB']; $i=0; while($b>=1024&&$i<3){$b/=1024;$i++;} return round($b,2).' '.$u[$i];
     }
 
+    // HTML 界面
     private function sendHtml() {
         if (headers_sent()) return;
         header('Content-Type: text/html; charset=utf-8');
@@ -332,10 +388,15 @@ class DavHandler {
             $acc .= '/' . $p; $bc[] = ['n'=>$p, 'p'=>$this->baseUri . $acc];
         }
 
+        // SVG 图标
         $iconFile = '<svg viewBox="0 0 24 24" class="svg-icon"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>';
         $iconFolder = '<svg viewBox="0 0 24 24" class="svg-icon" style="fill:#FBC02D"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>';
         $iconUp = '<svg viewBox="0 0 24 24" class="svg-icon"><path d="M11 9l1.42 1.42L8.83 14H18V4h2v12H8.83l3.59 3.58L11 21l-6-6 6-6z"/></svg>';
         $iconUpload = '<svg viewBox="0 0 24 24" class="svg-icon" style="fill:white"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>';
+        $iconRename = '<svg viewBox="0 0 24 24" class="svg-icon"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
+        $iconCopy = '<svg viewBox="0 0 24 24" class="svg-icon"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>';
+        $iconMove = '<svg viewBox="0 0 24 24" class="svg-icon"><path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/></svg>';
+        $iconDelete = '<svg viewBox="0 0 24 24" class="svg-icon" style="fill:#f44336"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>';
         ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -347,6 +408,8 @@ class DavHandler {
         :root { 
             --primary: #3b82f6; 
             --primary-hover: #2563eb;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
             --bg: #f3f4f6; 
             --card: #ffffff; 
             --text: #1f2937; 
@@ -362,7 +425,7 @@ class DavHandler {
             line-height: 1.5;
         }
         .container { 
-            max-width: 1000px; 
+            max-width: 1200px; 
             margin: 20px auto; 
             background: var(--card); 
             border-radius: 12px; 
@@ -417,7 +480,19 @@ class DavHandler {
             overflow: hidden;
         }
         .btn-primary:hover { background: var(--primary-hover); color: #fff; }
-        .svg-icon { width: 20px; height: 20px; fill: currentColor; margin-right: 8px; flex-shrink: 0; }
+        .btn-danger { 
+            background: var(--danger); 
+            color: #fff; 
+            border-color: var(--danger);
+        }
+        .btn-danger:hover { background: var(--danger-hover); color: #fff; }
+        .btn-sm { 
+            padding: 4px 8px; 
+            height: 28px; 
+            font-size: 12px;
+            margin: 0 2px;
+        }
+        .svg-icon { width: 16px; height: 16px; fill: currentColor; margin-right: 6px; flex-shrink: 0; }
         
         .upload-form { display: inline-flex; margin: 0; }
         .mkdir-form { display: inline-flex; gap: 8px; flex: 1; max-width: 300px; }
@@ -433,10 +508,10 @@ class DavHandler {
         input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
         
         .table-responsive { overflow-x: auto; flex: 1; }
-        .file-list { width: 100%; border-collapse: collapse; min-width: 600px; }
+        .file-list { width: 100%; border-collapse: collapse; min-width: 800px; }
         .file-list th { 
             text-align: left; 
-            padding: 12px 24px; 
+            padding: 12px 16px; 
             color: var(--text-light); 
             font-weight: 600; 
             font-size: 13px; 
@@ -445,7 +520,7 @@ class DavHandler {
             letter-spacing: 0.05em;
             background: #fff;
         }
-        .file-list td { padding: 14px 24px; border-bottom: 1px solid #f3f4f6; color: var(--text-light); font-size: 14px; }
+        .file-list td { padding: 12px 16px; border-bottom: 1px solid #f3f4f6; color: var(--text-light); font-size: 14px; }
         .file-list tr:last-child td { border-bottom: none; }
         .file-list tr:hover { background: #f9fafb; }
         
@@ -462,6 +537,38 @@ class DavHandler {
         }
         .file-link:hover { color: var(--primary); }
         
+        .action-buttons { display: flex; gap: 4px; flex-wrap: nowrap; }
+        
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            z-index: 1000; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .modal-content { 
+            background: white; 
+            padding: 24px; 
+            border-radius: 8px; 
+            min-width: 400px; 
+            max-width: 500px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .modal-header { 
+            margin-bottom: 16px; 
+            font-weight: 600; 
+            font-size: 18px;
+        }
+        .modal-actions { 
+            margin-top: 20px; 
+            display: flex; 
+            gap: 8px; 
+            justify-content: flex-end;
+        }
+        
         .footer { padding: 16px; background: #f9fafb; border-top: 1px solid var(--border); display: flex; justify-content: center; align-items: center; gap: 8px; color: var(--text-light); font-size: 13px; }
         .gh-link svg { width: 18px; height: 18px; fill: var(--text-light); transition: 0.2s; }
         .gh-link:hover svg { fill: #000; }
@@ -470,11 +577,13 @@ class DavHandler {
             .container { margin: 0; border-radius: 0; box-shadow: none; height: 100vh; }
             .file-list { min-width: 100%; }
             .hide-mobile { display: none; } 
-            .file-link { max-width: 200px; }
+            .file-link { max-width: 150px; }
             .mkdir-form { max-width: 100%; width: 100%; }
             .toolbar { flex-direction: column; align-items: stretch; }
             .btn { width: 100%; }
             .upload-form { width: 100%; }
+            .action-buttons { flex-direction: column; }
+            .modal-content { min-width: 90%; margin: 20px; }
         }
     </style>
 </head>
@@ -507,7 +616,7 @@ class DavHandler {
 
             <form method="post" class="mkdir-form">
                 <input type="text" name="mkdir" placeholder="New Folder Name" required autocomplete="off">
-                <button class="btn" style="width: auto;">Create</button>
+                <button class="btn" style="width: auto;">Create Folder</button>
             </form>
         </div>
 
@@ -515,9 +624,10 @@ class DavHandler {
             <table class="file-list">
                 <thead>
                     <tr>
-                        <th style="width: 60%">Name</th>
-                        <th class="hide-mobile" style="width: 20%">Size</th>
+                        <th style="width: 40%">Name</th>
+                        <th class="hide-mobile" style="width: 15%">Size</th>
                         <th class="hide-mobile" style="width: 20%">Modified</th>
+                        <th style="width: 25%">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -538,10 +648,26 @@ class DavHandler {
                         </td>
                         <td class="hide-mobile"><?php echo $isDir ? '-' : $this->fmt(filesize($p)); ?></td>
                         <td class="hide-mobile"><?php echo date('Y-m-d H:i', filemtime($p)); ?></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm" onclick="showRenameModal('<?php echo htmlspecialchars($f); ?>')">
+                                    <?php echo $iconRename; ?> Rename
+                                </button>
+                                <button class="btn btn-sm" onclick="showCopyModal('<?php echo htmlspecialchars($f); ?>')">
+                                    <?php echo $iconCopy; ?> Copy
+                                </button>
+                                <button class="btn btn-sm" onclick="showMoveModal('<?php echo htmlspecialchars($f); ?>')">
+                                    <?php echo $iconMove; ?> Move
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="showDeleteModal('<?php echo htmlspecialchars($f); ?>')">
+                                    <?php echo $iconDelete; ?> Delete
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                     <?php if(count($list) <= 2): ?>
-                        <tr><td colspan="3" style="text-align:center;color:#999;padding:40px;">Directory is empty</td></tr>
+                        <tr><td colspan="4" style="text-align:center;color:#999;padding:40px;">Directory is empty</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -554,6 +680,114 @@ class DavHandler {
             </a>
         </div>
     </div>
+
+    <!-- 重命名模态框 -->
+    <div id="renameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Rename Item</div>
+            <form method="post" id="renameForm">
+                <input type="hidden" name="action" value="rename">
+                <input type="hidden" name="name" id="renameName">
+                <input type="text" name="newname" id="renameNewname" placeholder="Enter new name" required style="width: 100%;">
+                <div class="modal-actions">
+                    <button type="button" class="btn" onclick="hideModal('renameModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Rename</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 复制模态框 -->
+    <div id="copyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Copy Item</div>
+            <form method="post" id="copyForm">
+                <input type="hidden" name="action" value="copy">
+                <input type="hidden" name="name" id="copyName">
+                <input type="text" name="target" id="copyTarget" placeholder="Enter target path (e.g. /folder)" required style="width: 100%;">
+                <div class="modal-actions">
+                    <button type="button" class="btn" onclick="hideModal('copyModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Copy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 移动模态框 -->
+    <div id="moveModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Move Item</div>
+            <form method="post" id="moveForm">
+                <input type="hidden" name="action" value="move">
+                <input type="hidden" name="name" id="moveName">
+                <input type="text" name="target" id="moveTarget" placeholder="Enter target path (e.g. /folder)" required style="width: 100%;">
+                <div class="modal-actions">
+                    <button type="button" class="btn" onclick="hideModal('moveModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Move</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 删除确认模态框 -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Delete Item</div>
+            <p>Are you sure you want to delete "<span id="deleteItemName"></span>"?</p>
+            <form method="post" id="deleteForm">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="name" id="deleteName">
+                <div class="modal-actions">
+                    <button type="button" class="btn" onclick="hideModal('deleteModal')">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showRenameModal(name) {
+            document.getElementById('renameName').value = name;
+            document.getElementById('renameNewname').value = name;
+            document.getElementById('renameNewname').focus();
+            showModal('renameModal');
+        }
+
+        function showCopyModal(name) {
+            document.getElementById('copyName').value = name;
+            document.getElementById('copyTarget').value = '<?php echo $this->reqPath === '/' ? '' : $this->reqPath; ?>';
+            document.getElementById('copyTarget').focus();
+            showModal('copyModal');
+        }
+
+        function showMoveModal(name) {
+            document.getElementById('moveName').value = name;
+            document.getElementById('moveTarget').value = '<?php echo $this->reqPath === '/' ? '' : $this->reqPath; ?>';
+            document.getElementById('moveTarget').focus();
+            showModal('moveModal');
+        }
+
+        function showDeleteModal(name) {
+            document.getElementById('deleteName').value = name;
+            document.getElementById('deleteItemName').textContent = name;
+            showModal('deleteModal');
+        }
+
+        // 点击模态框外部关闭
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
         <?php
