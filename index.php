@@ -9,6 +9,16 @@
 @ignore_user_abort(true);
 date_default_timezone_set('PRC');
 
+// --- Session & CSRF Init ---
+// 必须在输出任何内容前开启 Session 以存储 Token
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
+
 // --- Configuration & Constants ---
 define('ROOT_DIR', __DIR__);
 define('SCRIPT_NAME', basename($_SERVER['SCRIPT_NAME']));
@@ -18,7 +28,8 @@ define('STORAGE_NAME', 'storage');
 define('STORAGE_PATH', ROOT_DIR . DIRECTORY_SEPARATOR . STORAGE_NAME);
 define('AUTH_FILE', ROOT_DIR . DIRECTORY_SEPARATOR . '.htpasswd.php');
 define('SHARES_FILE', ROOT_DIR . DIRECTORY_SEPARATOR . '.shares.php');
-// Protect system files from being viewed/edited
+
+// Protect system files
 define('PROTECTED_FILES', serialize(['.', '..', '.htaccess', '.htpasswd', '.htpasswd.php', '.shares.php', SCRIPT_NAME, basename(__FILE__)]));
 
 // --- Language Definitions ---
@@ -36,14 +47,14 @@ if (isset($_GET['lang']) && in_array($_GET['lang'], ['cn', 'en'])) {
 }
 function L($k) { global $langs, $currLang; return $langs[$currLang][$k] ?? $k; }
 
-// --- Public Share Handling ---
+// --- Public Share Handling (No CSRF needed here, pure GET) ---
 if (isset($_GET['s'])) {
     if (file_exists(SHARES_FILE)) {
         $shares = include SHARES_FILE;
         if (is_array($shares) && isset($shares[$_GET['s']])) {
             $file = STORAGE_PATH . DIRECTORY_SEPARATOR . $shares[$_GET['s']];
             if (file_exists($file) && is_file($file)) {
-                $handler = new DavHandler(); // Helper to get mime
+                $handler = new DavHandler(); 
                 header('Content-Type: ' . $handler->getMimeType($file));
                 header('Content-Disposition: attachment; filename="'.basename($file).'"');
                 header('Content-Length: ' . filesize($file));
@@ -67,7 +78,6 @@ if (empty($_SERVER['PHP_AUTH_USER'])) {
         $_SERVER['PHP_AUTH_USER'] = $u; $_SERVER['PHP_AUTH_PW'] = $p;
     }
 }
-
 if (!file_exists(AUTH_FILE)) {
     if (!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
         $hash = password_hash($_SERVER['PHP_AUTH_PW'], PASSWORD_DEFAULT);
@@ -79,7 +89,6 @@ if (!file_exists(AUTH_FILE)) {
         die('Setup Required: Please login with desired username and password to initialize.');
     }
 }
-
 $auth = include AUTH_FILE;
 if (empty($_SERVER['PHP_AUTH_USER']) || $_SERVER['PHP_AUTH_USER'] !== $auth['u'] || !password_verify($_SERVER['PHP_AUTH_PW'], $auth['h'])) {
     header('WWW-Authenticate: Basic realm="EasyWebDAV"');
@@ -90,12 +99,14 @@ if (empty($_SERVER['PHP_AUTH_USER']) || $_SERVER['PHP_AUTH_USER'] !== $auth['u']
 // --- Main Request Handling ---
 $server = new DavHandler();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Route POST requests to Browser Handlers (These need CSRF checks)
     if (isset($_FILES['file'])) $server->handleBrowserUpload();
     else if (isset($_POST['mkdir'])) $server->handleBrowserMkdir();
     else if (isset($_POST['action'])) $server->handleBrowserAction();
     else if (isset($_POST['share_action'])) $server->handleShareAction();
-    else $server->serve();
+    else $server->serve(); // Fallback
 } else {
+    // Standard WebDAV methods (GET, PUT, DELETE, PROPFIND) - No CSRF check needed for protocol clients
     $server->serve();
 }
 
@@ -126,6 +137,14 @@ class DavHandler {
         $this->fsPath = STORAGE_PATH . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $parts);
     }
 
+    // --- CSRF Protection Logic ---
+    private function checkCsrf() {
+        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            header('HTTP/1.1 403 Forbidden');
+            die('Security Error: Invalid CSRF Token. Please refresh the page.');
+        }
+    }
+
     public function serve() {
         try {
             $method = $_SERVER['REQUEST_METHOD'];
@@ -146,33 +165,27 @@ class DavHandler {
         } catch (Exception $e) { http_response_code(500); }
     }
 
+    // ... (Standard WebDAV methods omit CSRF check to support clients like OpenList) ...
     private function doOptions() { 
         header('DAV: 1, 2'); 
         header('Allow: OPTIONS, GET, HEAD, DELETE, PROPFIND, PUT, MKCOL, COPY, MOVE, LOCK, UNLOCK'); 
         header('MS-Author-Via: DAV'); 
         exit; 
     }
-
+    
     private function doGet() {
         if (!file_exists($this->fsPath)) { http_response_code(404); exit; }
         if (is_dir($this->fsPath)) { $this->sendHtml(); exit; }
         if ($this->isProtected(basename($this->fsPath))) { http_response_code(404); exit; }
-
         $size = filesize($this->fsPath);
         $isDownload = isset($_GET['download']) && $_GET['download'] == 1;
         $mime = $this->getMimeType($this->fsPath);
-        
         header('Content-Type: ' . ($isDownload ? 'application/octet-stream' : $mime));
         header('Content-Length: ' . $size);
         header('ETag: "' . md5($this->fsPath . $size . filemtime($this->fsPath)) . '"');
-        
         header('Content-Disposition: ' . ($isDownload ? 'attachment' : 'inline') . '; filename="'.basename($this->fsPath).'"');
-
         while (ob_get_level()) ob_end_clean();
-        $fp = fopen($this->fsPath, 'rb'); 
-        fpassthru($fp); 
-        fclose($fp); 
-        exit;
+        $fp = fopen($this->fsPath, 'rb'); fpassthru($fp); fclose($fp); exit;
     }
 
     private function doPut() {
@@ -205,8 +218,7 @@ class DavHandler {
 
     private function doDelete() { 
         if (!file_exists($this->fsPath) || $this->fsPath == STORAGE_PATH) { http_response_code(403); exit; } 
-        $this->rm($this->fsPath); 
-        http_response_code(204); 
+        $this->rm($this->fsPath); http_response_code(204); 
     }
 
     private function doMkcol() { 
@@ -227,22 +239,30 @@ class DavHandler {
     }
 
     private function doLock() { $t = 'urn:uuid:' . uniqid(); header('Content-Type: application/xml; charset="utf-8"'); header('Lock-Token: <' . $t . '>'); echo '<?xml version="1.0" encoding="utf-8"?><D:prop xmlns:D="DAV:"><D:lockdiscovery><D:activelock><D:locktype><D:write/></D:locktype><D:lockscope><D:exclusive/></D:lockscope><D:depth>Infinity</D:depth><D:timeout>Second-3600</D:timeout><D:locktoken><D:href>'.$t.'</D:href></D:locktoken></D:activelock></D:lockdiscovery></D:prop>'; exit; }
+
     private function doUnlock() { http_response_code(204); }
     private function doHead() { file_exists($this->fsPath) ? http_response_code(200) : http_response_code(404); }
 
+    // --- Browser Action Handlers (WITH CSRF PROTECTION) ---
+
     public function handleBrowserUpload() {
+        $this->checkCsrf();
         if (is_dir($this->fsPath) && $_FILES['file']['error'] == 0) {
             $n = basename($_FILES['file']['name']);
             if (!$this->isProtected($n)) move_uploaded_file($_FILES['file']['tmp_name'], $this->fsPath . DIRECTORY_SEPARATOR . $n);
         } 
         $this->redirectBack();
     }
+
     public function handleBrowserMkdir() {
+        $this->checkCsrf();
         $n = str_replace(['/', '\\'], '', trim($_POST['mkdir']));
         if ($n && !$this->isProtected($n)) @mkdir($this->fsPath . DIRECTORY_SEPARATOR . $n);
         $this->redirectBack();
     }
+
     public function handleBrowserAction() {
+        $this->checkCsrf();
         $action = $_POST['action'] ?? ''; $name = $_POST['name'] ?? ''; $newname = $_POST['newname'] ?? ''; $target = $_POST['target'] ?? '';
         if (!$name || $this->isProtected($name)) { $this->redirectBack(); return; }
         $curr = $this->fsPath; $item = $curr . DIRECTORY_SEPARATOR . $name;
@@ -269,7 +289,9 @@ class DavHandler {
         } 
         $this->redirectBack();
     }
+
     public function handleShareAction() {
+        $this->checkCsrf();
         $name = $_POST['name'] ?? ''; $type = $_POST['share_action'] ?? '';
         $shares = file_exists(SHARES_FILE) ? include SHARES_FILE : []; if (!is_array($shares)) $shares = [];
         if ($type === 'create') {
@@ -302,6 +324,7 @@ class DavHandler {
         while($b>=1024&&$i<4){$b/=1024;$i++;} 
         return round($b,2).' '.$u[$i]; 
     }
+
     public function getMimeType($file) {
         $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
         $mimes = [
@@ -319,7 +342,7 @@ class DavHandler {
     private function sendHtml() {
         if (headers_sent()) return;
         header('Content-Type: text/html; charset=utf-8');
-        global $currLang;
+        global $currLang, $csrf_token;
         $list = scandir($this->fsPath);
         usort($list, function($a, $b) { 
             $ad = is_dir($this->fsPath . '/' . $a); $bd = is_dir($this->fsPath . '/' . $b); 
@@ -335,7 +358,6 @@ class DavHandler {
         $shares = file_exists(SHARES_FILE) ? include SHARES_FILE : []; 
         $sharesMap = []; 
         if(is_array($shares)) foreach($shares as $t => $p) $sharesMap[$p] = $t;
-
         // Icons
         $i_file = '<svg class="svg-i" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>';
         $i_folder = '<svg class="svg-i" viewBox="0 0 24 24" style="color:#fbbf24"><path fill="currentColor" d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>';
@@ -348,61 +370,77 @@ class DavHandler {
         ?>
 <!DOCTYPE html><html lang="<?php echo $currLang; ?>"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title><?php echo L('title'); ?></title>
 <style>
-:root { --bg: #ffffff; --text: #1f2937; --border: #e5e7eb; --hover: #f9fafb; --primary: #3b82f6; --accent: #10b981; --danger: #ef4444; }
-body.dark-mode { --bg: #111827; --text: #f3f4f6; --border: #374151; --hover: #1f2937; --primary: #60a5fa; --accent: #34d399; --danger: #f87171; }
-body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s, color 0.3s; }
-.container { max-width: 1200px; margin: 20px auto; background: var(--bg); border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); display: flex; flex-direction: column; width: 95%; border: 1px solid var(--border); overflow: hidden; }
-header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg); }
+:root { 
+    /* Light Yellow-Green Theme */
+    --bg-grad: linear-gradient(135deg, #f7fee7 0%, #ecfdf5 100%); 
+    --bg: #ffffff; --text: #1f2937; --border: #e5e7eb; --hover: #f0fdf4; 
+    --primary: #10b981; /* Green-500 */
+    --primary-dark: #059669; 
+    --accent: #84cc16; /* Lime-500 */
+    --danger: #ef4444; 
+    --shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.025);
+    --card-bg: rgba(255, 255, 255, 0.95);
+}
+body.dark-mode { 
+    /* Dark Grey-Green Theme */
+    --bg-grad: linear-gradient(135deg, #064e3b 0%, #111827 100%);
+    --bg: #1f2937; --text: #f3f4f6; --border: #374151; --hover: #111827; 
+    --primary: #34d399; --primary-dark: #10b981; 
+    --accent: #a3e635; --danger: #f87171; 
+    --card-bg: rgba(31, 41, 55, 0.95);
+}
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-grad); color: var(--text); min-height: 100vh; transition: background 0.3s, color 0.3s; background-attachment: fixed; }
+.container { max-width: 1200px; margin: 20px auto; background: var(--card-bg); border-radius: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; width: 95%; border: 1px solid var(--border); overflow: hidden; backdrop-filter: blur(5px); }
+header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.5); }
+body.dark-mode header { background: rgba(0,0,0,0.2); }
 .crumbs { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 16px; }
-.crumbs a { text-decoration: none; color: var(--primary); font-weight: 500; padding: 4px 6px; border-radius: 4px; transition: 0.2s; }
-.crumbs a:hover { background: var(--hover); }
+.crumbs a { text-decoration: none; color: var(--text); font-weight: 500; padding: 4px 8px; border-radius: 6px; transition: 0.2s; }
+.crumbs a:hover { background: var(--primary); color: white; }
 .bar { padding: 12px 24px; background: var(--hover); border-bottom: 1px solid var(--border); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-.btn { padding: 8px 14px; border: 1px solid var(--border); background: var(--bg); border-radius: 6px; cursor: pointer; font-size: 14px; color: var(--text); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; font-weight: 500; user-select: none; }
-.btn:hover { background: var(--hover); border-color: var(--primary); color: var(--primary); }
-.btn-p { background: var(--primary); color: white; border-color: var(--primary); }
-.btn-p:hover { background: var(--primary); opacity: 0.9; color: white; }
-.btn-d { color: var(--danger); }
+.btn { padding: 8px 16px; border: 1px solid var(--border); background: var(--bg); border-radius: 8px; cursor: pointer; font-size: 14px; color: var(--text); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; font-weight: 600; user-select: none; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
+.btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); box-shadow: 0 2px 4px 0 rgba(0,0,0,0.05); }
+.btn-p { background: linear-gradient(to bottom right, var(--primary), var(--primary-dark)); color: white; border: none; }
+.btn-p:hover { opacity: 0.9; color: white; border: none; }
+.btn-d { color: var(--danger); border-color: transparent; }
 .btn-d:hover { background: var(--danger); color: white; border-color: var(--danger); }
 .table-wrap { overflow-x: auto; flex: 1; min-height: 300px; }
 table { width: 100%; border-collapse: collapse; min-width: 700px; }
-th { text-align: left; padding: 14px 20px; color: #6b7280; font-size: 12px; font-weight: 600; text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--hover); letter-spacing: 0.05em; }
-body.dark-mode th { color: #9ca3af; }
-td { padding: 12px 20px; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text); vertical-align: middle; }
+th { text-align: left; padding: 16px 20px; color: var(--primary-dark); font-size: 12px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(240, 253, 244, 0.5); letter-spacing: 0.05em; }
+body.dark-mode th { background: rgba(6, 78, 59, 0.3); color: var(--primary); }
+td { padding: 14px 20px; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text); vertical-align: middle; }
 tr:hover td { background: var(--hover); }
-.link { text-decoration: none; color: var(--text); font-weight: 500; display: flex; align-items: center; gap: 10px; }
+.link { text-decoration: none; color: var(--text); font-weight: 500; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
 .link:hover { color: var(--primary); }
-.svg-i { width: 22px; height: 22px; color: #9ca3af; flex-shrink: 0; }
+.svg-i { width: 24px; height: 24px; color: #9ca3af; flex-shrink: 0; }
 .act-grp { display: flex; gap: 4px; justify-content: flex-end; }
-.act-btn { padding: 6px; border: none; background: transparent; border-radius: 4px; cursor: pointer; color: #9ca3af; display: flex; align-items: center; position: relative; transition: 0.2s; }
+.act-btn { padding: 8px; border: none; background: transparent; border-radius: 6px; cursor: pointer; color: #9ca3af; display: flex; align-items: center; position: relative; transition: 0.2s; }
 .act-btn svg { width: 18px; height: 18px; }
-.act-btn:hover { background: var(--hover); color: var(--primary); }
-.act-btn.del:hover { background: var(--danger); color: white; }
-
-/* CSS Tooltip to replace native title */
+.act-btn:hover { background: #ecfdf5; color: var(--primary); }
+body.dark-mode .act-btn:hover { background: rgba(52, 211, 153, 0.1); }
+.act-btn.del:hover { background: #fee2e2; color: var(--danger); }
+body.dark-mode .act-btn.del:hover { background: rgba(239, 68, 68, 0.1); }
+/* CSS Tooltip */
 .act-btn[data-tooltip]:hover::after {
     content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
     background: #1f2937; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; white-space: nowrap;
     opacity: 0; animation: fadeIn 0.2s forwards; pointer-events: none; margin-bottom: 6px; z-index: 10;
 }
 @keyframes fadeIn { to { opacity: 1; } }
-
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(2px); }
-.modal-box { background: var(--bg); padding: 24px; border-radius: 12px; width: 100%; max-width: 420px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); border: 1px solid var(--border); }
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(4px); }
+.modal-box { background: var(--bg); padding: 24px; border-radius: 16px; width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 1px solid var(--border); }
 .footer { padding: 20px; text-align: center; font-size: 13px; color: #6b7280; background: var(--hover); border-top: 1px solid var(--border); display: flex; justify-content: center; align-items: center; gap: 8px; }
 body.dark-mode .footer { color: #9ca3af; }
 .gh-icon svg { width: 20px; height: 20px; fill: #6b7280; transition: 0.2s; }
-.gh-icon:hover svg { fill: var(--text); }
-
-/* Theme Toggle & Lamp Animation */
+.gh-icon:hover svg { fill: var(--primary); }
+/* Theme Toggle */
 .theme-toggle { background: none; border: none; cursor: pointer; padding: 8px; border-radius: 50%; color: var(--text); transition: background 0.2s; outline: none; }
-.theme-toggle:hover { background: var(--hover); }
+.theme-toggle:hover { background: rgba(0,0,0,0.05); }
 .lamp-icon { width: 24px; height: 24px; animation: floating 3s ease-in-out infinite; }
 .lamp-bulb { fill: transparent; stroke: #6b7280; stroke-width: 2; transition: all 0.3s ease; }
 .lamp-glow { fill: #fbbf24; opacity: 0; transition: opacity 0.4s ease; filter: drop-shadow(0 0 4px #fbbf24); }
 body.dark-mode .lamp-bulb { stroke: #fbbf24; }
 body.dark-mode .lamp-glow { opacity: 1; }
 @keyframes floating { 0% { transform: translateY(0px); } 50% { transform: translateY(-4px); } 100% { transform: translateY(0px); } }
-
 @media(max-width:768px){ .container{margin:0;border-radius:0;height:100vh;border:none} .hide-m{display:none} .link{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .bar{padding:10px;gap:8px} .btn{padding:6px 10px;font-size:13px} .crumbs{font-size:14px} }
 </style></head>
 <body><div class="container">
@@ -420,8 +458,14 @@ body.dark-mode .lamp-glow { opacity: 1; }
 </header>
 <div class="bar">
     <?php if($this->reqPath!=='/'): $pp=array_filter(explode('/',$this->reqPath));array_pop($pp); ?><a href="<?php echo $this->baseUri.'/'.implode('/',array_map('rawurlencode',$pp)); ?>" class="btn"><?php echo L('back'); ?></a><?php endif; ?>
-    <form method="post" enctype="multipart/form-data" style="margin:0"><label class="btn btn-p"><?php echo L('upload'); ?><input type="file" name="file" hidden onchange="this.form.submit()"></label></form>
-    <form method="post" style="display:flex;gap:8px;margin:0;flex:1"><input type="text" name="mkdir" placeholder="<?php echo L('new_folder'); ?>" required style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;outline:none;font-size:14px;color:var(--text);background:var(--bg);min-width:120px;transition:0.2s"><button class="btn" type="submit"><?php echo L('create'); ?></button></form>
+    <form method="post" enctype="multipart/form-data" style="margin:0">
+        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+        <label class="btn btn-p"><?php echo L('upload'); ?><input type="file" name="file" hidden onchange="this.form.submit()"></label>
+    </form>
+    <form method="post" style="display:flex;gap:8px;margin:0;flex:1">
+        <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
+        <input type="text" name="mkdir" placeholder="<?php echo L('new_folder'); ?>" required style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;outline:none;font-size:14px;color:var(--text);background:var(--bg);min-width:120px;transition:0.2s"><button class="btn" type="submit"><?php echo L('create'); ?></button>
+    </form>
 </div>
 <div class="table-wrap"><table>
     <thead><tr><th><?php echo L('name'); ?></th><th class="hide-m"><?php echo L('size'); ?></th><th class="hide-m"><?php echo L('modified'); ?></th><th style="text-align:right"><?php echo L('actions'); ?></th></tr></thead>
@@ -433,7 +477,7 @@ body.dark-mode .lamp-glow { opacity: 1; }
         $link = $this->baseUri.rtrim($this->reqPath,'/').'/'.rawurlencode($f);
     ?>
     <tr>
-        <td><a href="<?php echo $link; ?>" class="link" target="<?php echo $d?'_self':'_blank';?>"><?php echo $d?$i_folder:$i_file;echo htmlspecialchars($f);if($sh)echo '<span style="font-size:10px;color:var(--accent);background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);padding:0 5px;border-radius:4px;font-weight:600">SHARED</span>';?></a></td>
+        <td><a href="<?php echo $link; ?>" class="link" target="<?php echo $d?'_self':'_blank';?>"><?php echo $d?$i_folder:$i_file;echo htmlspecialchars($f);if($sh)echo '<span style="font-size:10px;color:var(--accent);background:rgba(132,204,22,0.1);border:1px solid rgba(132,204,22,0.2);padding:0 5px;border-radius:4px;font-weight:600">SHARED</span>';?></a></td>
         <td class="hide-m"><?php echo $d?'-':$this->fmt(filesize($p)); ?></td><td class="hide-m"><?php echo date('Y-m-d H:i',filemtime($p)); ?></td>
         <td><div class="act-grp">
             <?php if(!$d):?>
@@ -458,7 +502,6 @@ function toggleDarkMode() {
     localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
 }
 if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark-mode');
-
 const cur='<?php echo $this->reqPath==='/'?'':$this->reqPath;?>';
 function pop(a,n){
     const m=document.getElementById('modal'),t=document.getElementById('m-t'),c=document.getElementById('m-c'),ok=document.getElementById('m-ok');
@@ -469,7 +512,7 @@ function pop(a,n){
     c.innerHTML=h;
     if(document.getElementById('inp')) setTimeout(()=>document.getElementById('inp').focus(),50);
     ok.onclick=()=>{
-        const f=document.createElement('form');f.method='post';f.innerHTML='<input name="action" value="'+a+'"><input name="name" value="'+n+'">';
+        const f=document.createElement('form');f.method='post';f.innerHTML='<input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>"><input name="action" value="'+a+'"><input name="name" value="'+n+'">';
         if(document.getElementById('inp')) f.innerHTML+='<input name="'+(a==='rename'?'newname':'target')+'" value="'+document.getElementById('inp').value+'">';
         document.body.appendChild(f);f.submit();
     };
@@ -486,7 +529,7 @@ function share(n,t){
     document.getElementById('m-c').innerHTML=h; ok.style.display='none';
 }
 function cpLn(){const c=document.getElementById('s-lnk');c.select();document.execCommand('copy');alert('<?php echo L('copied');?>');}
-function subShare(a,n,t){ const f=document.createElement('form');f.method='post';f.innerHTML='<input name="share_action" value="'+a+'"><input name="name" value="'+n+'"><input name="token" value="'+t+'">';document.body.appendChild(f);f.submit(); }
+function subShare(a,n,t){ const f=document.createElement('form');f.method='post';f.innerHTML='<input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>"><input name="share_action" value="'+a+'"><input name="name" value="'+n+'"><input name="token" value="'+t+'">';document.body.appendChild(f);f.submit(); }
 window.onclick=e=>{if(e.target.className==='modal')e.target.style.display='none'};
 </script></body></html>
 <?php
