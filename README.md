@@ -3,8 +3,6 @@
 [![PHP Version](https://img.shields.io/badge/php-7.0%20--%208.4-blue.svg)](https://php.net/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-***
-
 A single-file, secure, and aesthetic WebDAV server & file manager written in PHP.
 
 **EasyWebDAV-PHP** is designed to be the simplest way to deploy a private cloud storage. It serves as both a modern web-based file manager and a standard WebDAV server compatible with various clients.
