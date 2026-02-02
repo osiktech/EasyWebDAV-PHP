@@ -685,26 +685,24 @@ class Dav {
           </div>
         </div>
       </div>
-      <?php if(LOG_ENABLED): ?>
-      <div id="logModal" class="mod" style="display:none">
+      <?php if(LOG_ENABLED): ?><div id="logModal" class="mod" style="display:none">
         <div class="mb" style="max-width:800px">
-          <h3 style="margin-top:0;display:flex;justify-content:space-between;align-items:center">
-            <span><?=T('log_title')?></span>
-            <div style="display:flex;gap:8px">
-              <a href="?log_action=download" class="btn" style="font-size:13px"><?=T('log_download')?></a>
-              <a href="?log_action=clear" class="btn bd" style="font-size:13px" onclick="return confirm('Clear logs?')"><?=T('log_clear')?></a>
-              <button class="btn" onclick="cl()"><?=T('cc')?></button>
-            </div>
-          </h3>
+          <div style="margin-top:0;display:flex;gap:8px;justify-content:space-between;align-items:center">
+            <h3 style="display:flex;">
+              <span><?=T('log_title')?></span>
+            </h3>
+            <a href="?log_action=download" class="btn" style="font-size:13px"><?=T('log_download')?></a>
+            <a href="?log_action=clear" class="btn bd" style="font-size:13px" onclick="return confirm('Clear logs?')"><?=T('log_clear')?></a>
+            <button class="btn" onclick="cl()"><?=T('cc')?></button>
+          </div>
           <div style="max-height:400px;overflow-y:auto;background:rgba(0,0,0,0.03);border-radius:10px;padding:16px;margin-top:16px">
             <pre style="margin:0;font-size:12px;line-height:1.5;color:var(--tx)">
-              <?php if(LOG_ENABLED){$log_file=LOG_PATH.'/'.date('Y-m-d').'.log';echo htmlspecialchars(file_exists($log_file)?file_get_contents($log_file):'No logs today.');} ?>
+<?php if(LOG_ENABLED){$log_file=LOG_PATH.'/'.date('Y-m-d').'.log';echo htmlspecialchars(file_exists($log_file)?file_get_contents($log_file):'No logs today.');} ?>
             </pre>
           </div>
         </div>
       </div>
-      <?php endif; ?>
-      <input id="q_lnk" value="" hidden>
+      <?php endif; ?><input id="q_lnk" value="" hidden>
       <script>
         const $=i=>document.getElementById(i), csrf='<?=$csrf?>', cur='<?=$this->req?>', base='<?=BASE?>';
 
