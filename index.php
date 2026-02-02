@@ -554,9 +554,9 @@ class Dav {
     'dl'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>',
     'sh'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>',
     'ed'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>',
-    'cp'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>',
-    'mv'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/></svg>',
-    'rm'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
+    'copy'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>',
+    'move'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/></svg>',
+    'delete'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
     'log'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>',
     'bat'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>',
     'up_f'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10zm-7.01-5l-1.41-1.41 2.01-2.01h-2.83v-2h2.83l-2.01-2.01 1.41-1.41 4.42 4.42-4.42 4.42z"/></svg>'
@@ -698,29 +698,60 @@ class Dav {
           </form>
           <div id="batch_acts" class="batch-bar">
             <span><?=T('batch')?>:</span>
-            <button onclick="p('cp', null)" class="ab" title="<?=T('cp')?>"><?=$ICONS['cp']?></button>
-            <button onclick="p('mv', null)" class="ab" title="<?=T('mv')?>"><?=$ICONS['mv']?></button>
-            <button onclick="p('rm', null)" class="ab del" title="<?=T('rm')?>"><?=$ICONS['rm']?></button>
+            <button onclick="p('cp', null)" class="ab" title="<?=T('cp')?>"><?=$ICONS['copy']?></button>
+            <button onclick="p('mv', null)" class="ab" title="<?=T('mv')?>"><?=$ICONS['move']?></button>
+            <button onclick="p('rm', null)" class="ab del" title="<?=T('rm')?>"><?=$ICONS['delete']?></button>
           </div>
         </div>
         <div class="main">
           <table>
-            <thead><tr>
-              <th style="width:20px;padding-right:0"><input type="checkbox" class="chk" onchange="toggleAll(this)"></th>
-              <th><?=T('nm')?></th><th class="hm"><?=T('sz')?></th><th class="hm"><?=T('tm')?></th><th style="text-align:right"><?=T('ac')?></th>
-            </tr></thead>
-            <tbody>
-              <?php if(count($l)<=2): ?><tr><td colspan="5" class="emp-msg"><?=T('emp')?></td></tr>
-              <?php else: foreach($l as $f): if($this->isDenied($f))continue; $p=$this->path.'/'.$f; $d=is_dir($p); $lk=$this->uri.rtrim($this->req,'/').'/'.rawurlencode($f); $rp=str_replace('\\','/',ltrim(substr($p,strlen(S_PATH)),'/\\')); $shr=isset($sm[$rp])?$sh[$sm[$rp]]:null;
-              $sTok=$shr?$sm[$rp]:''; $st=$chkSt($shr); $stCls=['','ok','exp','wait']; $stTxt=['',T('st_ok'),T('st_exp'),T('st_wait')]; ?>
+            <thead>
               <tr>
-                <td style="padding-right:0"><input type="checkbox" class="chk sel-item" value="<?=htmlspecialchars($f)?>" onchange="updB()"></td>
-                <td><a href="<?=$lk?>" class="lnk" target="<?=$d?'_self':'_blank'?>"><?=$d?$ICONS['directory']:$ICONS['file']?><?=htmlspecialchars($f)?><?php if($shr): ?><span class="badge <?=$stCls[$st]?>"><?=$stTxt[$st]?></span><?php endif; ?></a></td>
-                <td class="hm"><?=$d?'-':$this->size(filesize($p))?></td><td class="hm"><?=date('Y-m-d H:i',filemtime($p))?></td>
-                <td><div class="acts">
-                    <?php if(!$d): ?><a href="<?=$lk?>?dl=1" class="ab" title="<?=T('dl')?>"><?=$ICONS['dl']?></a><button onclick="shareFile('<?=addslashes($f)?>','<?=$sTok?>',<?=$shr?$shr['expires']:0?>,<?=$shr?$shr['max_uses']:0?>,<?=$shr?$shr['uses']:0?>,<?=$shr?$shr['start_ts']:0?>)" class="ab" title="<?=T('sh')?>"><?=$ICONS['sh']?></button><?php endif; ?>
-                    <button onclick="p('rn','<?=$f?>')" class="ab" title="<?=T('rn')?>"><?=$ICONS['ed']?></button><button onclick="p('cp','<?=$f?>')" class="ab" title="<?=T('cp')?>"><?=$ICONS['cp']?></button><button onclick="p('mv','<?=$f?>')" class="ab" title="<?=T('mv')?>"><?=$ICONS['mv']?></button><button onclick="p('rm','<?=$f?>')" class="ab del" title="<?=T('rm')?>"><?=$ICONS['rm']?></button>
-                </div></td>
+                <th style="width:20px;padding-right:0">
+                  <input type="checkbox" class="chk" onchange="toggleAll(this)">
+                </th>
+                <th><?=T('nm')?></th>
+                <th class="hm"><?=T('sz')?></th>
+                <th class="hm"><?=T('tm')?></th>
+                <th style="text-align:right"><?=T('ac')?></th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php if(count($l)<=2): ?><tr>
+                <td colspan="5" class="emp-msg"><?=T('emp')?></td>
+              </tr>
+              <?php else: foreach($l as $f): if($this->isDenied($f))continue;
+                $p=$this->path.'/'.$f;
+                $d=is_dir($p);
+                $lk=$this->uri.rtrim($this->req,'/').'/'.rawurlencode($f);
+                $rp=str_replace('\\','/',ltrim(substr($p,strlen(S_PATH)),'/\\'));
+                  $shr=isset($sm[$rp])?$sh[$sm[$rp]]:null;
+                $sTok=$shr?$sm[$rp]:'';
+                $st=$chkSt($shr);
+                $stCls=['','ok','exp','wait'];
+                $stTxt=['',T('st_ok'),T('st_exp'),T('st_wait')];
+              ?>
+              <tr>
+                <td style="padding-right:0">
+                  <input type="checkbox" class="chk sel-item" value="<?=htmlspecialchars($f)?>" onchange="updB()">
+                </td>
+                <td>
+                  <a href="<?=$lk?>" class="lnk" target="<?=$d?'_self':'_blank'?>"><?=$d?$ICONS['directory']:$ICONS['file']?><?=htmlspecialchars($f)?><?php if($shr): ?><span class="badge <?=$stCls[$st]?>"><?=$stTxt[$st]?></span><?php endif; ?></a>
+                </td>
+                <td class="hm"><?=$d?'-':$this->size(filesize($p))?></td>
+                <td class="hm"><?=date('Y-m-d H:i',filemtime($p))?></td>
+                <td>
+                  <div class="acts">
+                    <?php if(!$d): ?>
+                      <a href="<?=$lk?>?dl=1" class="ab" title="<?=T('dl')?>"><?=$ICONS['dl']?></a>
+                      <button onclick="shareFile('<?=addslashes($f)?>','<?=$sTok?>',<?=$shr?$shr['expires']:0?>,<?=$shr?$shr['max_uses']:0?>,<?=$shr?$shr['uses']:0?>,<?=$shr?$shr['start_ts']:0?>)" class="ab" title="<?=T('sh')?>"><?=$ICONS['sh']?></button>
+                    <?php endif; ?>
+                    <button onclick="p('rn','<?=$f?>')" class="ab" title="<?=T('rn')?>"><?=$ICONS['ed']?></button>
+                    <button onclick="p('cp','<?=$f?>')" class="ab" title="<?=T('cp')?>"><?=$ICONS['cp']?></button>
+                    <button onclick="p('mv','<?=$f?>')" class="ab" title="<?=T('mv')?>"><?=$ICONS['mv']?></button>
+                    <button onclick="p('rm','<?=$f?>')" class="ab del" title="<?=T('rm')?>"><?=$ICONS['rm']?></button>
+                  </div>
+                </td>
               </tr>
               <?php endforeach; endif; ?>
             </tbody>
