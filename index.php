@@ -12,7 +12,7 @@ define('LOG_PATH', __DIR__.'/logs');
 @error_reporting(0);
 @set_time_limit(0);
 @ignore_user_abort(true);
-date_default_timezone_set('PRC');
+date_default_timezone_set('UTC');
 
 // --- Environment Init ---
 if(LOG_ENABLED && !file_exists(LOG_PATH)) @mkdir(LOG_PATH, 0755, true);
@@ -42,7 +42,7 @@ if(!file_exists(S_PATH.'/.htaccess')) @file_put_contents(S_PATH.'/.htaccess', "D
 $htPath = ROOT.'/.htaccess';
 $htContent = "Options -Indexes\nRewriteEngine On\n";
 $htContent .= "RewriteRule ^(\.htpasswd\.php|\.shares\.php|logs/) - [F,L]\n";
-$htContent .= "RewriteRule ^s-[a-zA-Z0-9]+\.php(.*)$ ".S_NAME."$1 [L,QSA]\n"; 
+$htContent .= "RewriteRule ^s-[a-zA-Z0-9]+\.php(.*)$ ".S_NAME."$1 [L,QSA]\n";
 $htContent .= "RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]";
 
 if(!file_exists($htPath) || md5(file_get_contents($htPath)) !== md5($htContent)) {
@@ -79,7 +79,7 @@ if($shareToken && ctype_alnum($shareToken)){
         $s=include SHARE_F;
         if(isset($s[$shareToken]) && is_array($s[$shareToken]) && file_exists($f=S_PATH.'/'.$s[$shareToken]['path'])){
             $share = $s[$shareToken];
-            
+
             // 1. Password Check
             if(!empty($share['pwd'])) {
                 $pass_ok = false;
@@ -91,7 +91,7 @@ if($shareToken && ctype_alnum($shareToken)){
                         $err_msg = 'Invalid Password';
                     }
                 }
-                
+
                 if(!$pass_ok) {
                     $fname = basename($f);
                     ?>
@@ -124,7 +124,7 @@ if($shareToken && ctype_alnum($shareToken)){
 
             // 2. Logic Checks
             if(isset($share['start_ts']) && $share['start_ts'] > time()){
-                 http_response_code(403); 
+                 http_response_code(403);
                  die('Link not active yet. Starts at: '.date('Y-m-d H:i:s', $share['start_ts']));
             }
             if($share['expires'] > 0 && time() > $share['expires']){
@@ -133,25 +133,25 @@ if($shareToken && ctype_alnum($shareToken)){
             if($share['max_uses'] > 0 && $share['uses'] >= $share['max_uses']){
                 http_response_code(410); die('Link expired (Max uses)');
             }
-            
+
             // Update Stats
             $s[$shareToken]['uses']++;
             @file_put_contents(SHARE_F, "<?php\nreturn ".var_export($s,true).";", LOCK_EX);
             log_action('SHARE_ACCESS', 'Token: '.$shareToken.' Path: '.$share['path']);
-            
+
             // Serve File
             $x = strtolower(pathinfo($f, PATHINFO_EXTENSION));
             $m = ['txt'=>'text/plain','html'=>'text/html','css'=>'text/css','js'=>'application/javascript','json'=>'application/json','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','png'=>'image/png','gif'=>'image/gif','mp4'=>'video/mp4','pdf'=>'application/pdf','zip'=>'application/zip'];
-            
+
             $size = filesize($f);
             $start = 0; $end = $size - 1;
             header('Content-Type: '.($m[$x]??'application/octet-stream'));
             header('Accept-Ranges: bytes');
-            
+
             if(isset($_SERVER['HTTP_RANGE'])) {
                 list(, $range) = explode('=', $_SERVER['HTTP_RANGE'], 2);
                 if(strpos($range, ',') === false) {
-                    if($range == '-') $start = $size - 1; 
+                    if($range == '-') $start = $size - 1;
                     else {
                         $range = explode('-', $range);
                         $start = $range[0];
@@ -170,10 +170,10 @@ if($shareToken && ctype_alnum($shareToken)){
                     exit;
                 }
             }
-            
+
             header('Content-Disposition: attachment; filename="'.basename($f).'"');
             header('Content-Length: '.$size);
-            readfile($f); 
+            readfile($f);
             exit;
         }
     }
@@ -208,8 +208,9 @@ if($u !== $ac['u'] || !password_verify($p, $ac['h'])){
 log_action('LOGIN', 'User: '.$u, $u);
 
 // --- UI & Translation ---
-$lang = $_COOKIE['l'] ?? 'cn';
-$L=['cn'=>['home'=>'首页','back'=>'返回上级','up'=>'上传文件','up_folder'=>'文件夹','new'=>'新建文件夹','cr'=>'创建','nm'=>'名称','sz'=>'大小','tm'=>'修改时间','ac'=>'操作','dl'=>'下载','rn'=>'重命名','cp'=>'复制','mv'=>'移动','rm'=>'删除','sh'=>'分享','emp'=>'空目录','tip'=>'确认执行操作','lnk'=>'直链地址','cpl'=>'复制链接','ok'=>'确定','cc'=>'取消','tar'=>'目标路径','sh_m'=>'分享管理','sh_new'=>'新建分享','sh_up'=>'更新设置','sh_rnd'=>'随机生成','sh_cus'=>'自定义','sh_del'=>'取消分享','sh_ok'=>'链接已复制','exp'=>'有效期','uses'=>'使用情况','unlimited'=>'无限制','days'=>'天','hours'=>'小时','mins'=>'分钟','max_uses'=>'最大次数','set'=>'设置','link_copied'=>'链接已复制','exp_never'=>'永不过期','exp_1d'=>'1天','exp_7d'=>'7天','exp_30d'=>'30天','uses_1'=>'1次','uses_5'=>'5次','uses_10'=>'10次','uses_50'=>'50次','custom'=>'自定义','sharing'=>'分享设置','save'=>'保存','modify'=>'修改配置','log_title'=>'操作日志','log_download'=>'下载日志','log_clear'=>'清空日志','st_exp'=>'已过期','st_ok'=>'分享中','st_wait'=>'未开始','stat'=>'统计信息','exp_at'=>'到期时间','start_at'=>'生效时间','used'=>'已用','delay'=>'生效延时','delay_none'=>'立即生效','delay_10m'=>'10分钟后','delay_1h'=>'1小时后','path_ph'=>'输入路径按回车跳转...','pwd'=>'访问密码','pwd_ph'=>'留空则无密码','sel_all'=>'全选','batch'=>'批量操作','del_sel'=>'删除选中','drag_tip'=>'释放以上传文件'],'en'=>['home'=>'Home','back'=>'Back','up'=>'Upload File','up_folder'=>'Folder','new'=>'New Folder','cr'=>'Create','nm'=>'Name','sz'=>'Size','tm'=>'Modified','ac'=>'Actions','dl'=>'Download','rn'=>'Rename','cp'=>'Copy','mv'=>'Move','rm'=>'Delete','sh'=>'Share','emp'=>'Empty','tip'=>'Confirm Action','lnk'=>'Link','cpl'=>'Copy Link','ok'=>'OK','cc'=>'Cancel','tar'=>'Target Path','sh_m'=>'Share Manager','sh_new'=>'New Share','sh_up'=>'Update Settings','sh_rnd'=>'Random','sh_cus'=>'Custom','sh_del'=>'Unshare','sh_ok'=>'Link Copied','exp'=>'Expires In','uses'=>'Usage','unlimited'=>'Unlimited','days'=>'days','hours'=>'hours','mins'=>'minutes','max_uses'=>'Max Uses','set'=>'Settings','link_copied'=>'Link copied','exp_never'=>'Never','exp_1d'=>'1 day','exp_7d'=>'7 days','exp_30d'=>'30 days','uses_1'=>'1 use','uses_5'=>'5 uses','uses_10'=>'10 uses','uses_50'=>'50 uses','custom'=>'Custom','sharing'=>'Sharing Settings','save'=>'Save','modify'=>'Modify Share','log_title'=>'Operation Logs','log_download'=>'Download Log','log_clear'=>'Clear Log','st_exp'=>'EXPIRED','st_ok'=>'SHARED','st_wait'=>'WAITING','stat'=>'Statistics','exp_at'=>'Expires At','start_at'=>'Starts At','used'=>'Used','delay'=>'Start Delay','delay_none'=>'Immediate','delay_10m'=>'In 10 mins','delay_1h'=>'In 1 hour','path_ph'=>'Type path and hit Enter...','pwd'=>'Password','pwd_ph'=>'Empty = No Password','sel_all'=>'Select All','batch'=>'Batch','del_sel'=>'Delete Selected','drag_tip'=>'Drop to Upload']];
+$lang = $_COOKIE['l'] ?? 'de';
+$L=['cn'=> ['home'=>'首页','back'=>'返回上级','up'=>'上传文件','up_folder'=>'文件夹','new'=>'新建文件夹','cr'=>'创建','nm'=>'名称','sz'=>'大小','tm'=>'修改时间','ac'=>'操作','dl'=>'下载','rn'=>'重命名','cp'=>'复制','mv'=>'移动','rm'=>'删除','sh'=>'分享','emp'=>'空目录','tip'=>'确认执行操作','lnk'=>'直链地址','cpl'=>'复制链接','ok'=>'确定','cc'=>'取消','tar'=>'目标路径','sh_m'=>'分享管理','sh_new'=>'新建分享','sh_up'=>'更新设置','sh_rnd'=>'随机生成','sh_cus'=>'自定义','sh_del'=>'取消分享','sh_ok'=>'链接已复制','exp'=>'有效期','uses'=>'使用情况','unlimited'=>'无限制','days'=>'天','hours'=>'小时','mins'=>'分钟','max_uses'=>'最大次数','set'=>'设置','link_copied'=>'链接已复制','exp_never'=>'永不过期','exp_1d'=>'1天','exp_7d'=>'7天','exp_30d'=>'30天','uses_1'=>'1次','uses_5'=>'5次','uses_10'=>'10次','uses_50'=>'50次','custom'=>'自定义','sharing'=>'分享设置','save'=>'保存','modify'=>'修改配置','log_title'=>'操作日志','log_download'=>'下载日志','log_clear'=>'清空日志','st_exp'=>'已过期','st_ok'=>'分享中','st_wait'=>'未开始','stat'=>'统计信息','exp_at'=>'到期时间','start_at'=>'生效时间','used'=>'已用','delay'=>'生效延时','delay_none'=>'立即生效','delay_10m'=>'10分钟后','delay_1h'=>'1小时后','path_ph'=>'输入路径按回车跳转...','pwd'=>'访问密码','pwd_ph'=>'留空则无密码','sel_all'=>'全选','batch'=>'批量操作','del_sel'=>'删除选中','drag_tip'=>'释放以上传文件'],'en'=>['home'=>'Home','back'=>'Back','up'=>'Upload File','up_folder'=>'Folder','new'=>'New Folder','cr'=>'Create','nm'=>'Name','sz'=>'Size','tm'=>'Modified','ac'=>'Actions','dl'=>'Download','rn'=>'Rename','cp'=>'Copy','mv'=>'Move','rm'=>'Delete','sh'=>'Share','emp'=>'Empty','tip'=>'Confirm Action','lnk'=>'Link','cpl'=>'Copy Link','ok'=>'OK','cc'=>'Cancel','tar'=>'Target Path','sh_m'=>'Share Manager','sh_new'=>'New Share','sh_up'=>'Update Settings','sh_rnd'=>'Random','sh_cus'=>'Custom','sh_del'=>'Unshare','sh_ok'=>'Link Copied','exp'=>'Expires In','uses'=>'Usage','unlimited'=>'Unlimited','days'=>'days','hours'=>'hours','mins'=>'minutes','max_uses'=>'Max Uses','set'=>'Settings','link_copied'=>'Link copied','exp_never'=>'Never','exp_1d'=>'1 day','exp_7d'=>'7 days','exp_30d'=>'30 days','uses_1'=>'1 use','uses_5'=>'5 uses','uses_10'=>'10 uses','uses_50'=>'50 uses','custom'=>'Custom','sharing'=>'Sharing Settings','save'=>'Save','modify'=>'Modify Share','log_title'=>'Operation Logs','log_download'=>'Download Log','log_clear'=>'Clear Log','st_exp'=>'EXPIRED','st_ok'=>'SHARED','st_wait'=>'WAITING','stat'=>'Statistics','exp_at'=>'Expires At','start_at'=>'Starts At','used'=>'Used','delay'=>'Start Delay','delay_none'=>'Immediate','delay_10m'=>'In 10 mins','delay_1h'=>'In 1 hour','path_ph'=>'Type path and hit Enter...','pwd'=>'Password','pwd_ph'=>'Empty = No Password','sel_all'=>'Select All','batch'=>'Batch','del_sel'=>'Delete Selected','drag_tip'=>'Drop to Upload'],'de'=>['home'=>'Start','back'=>'Zurück','up'=>'Datei hochladen','up_folder'=>'Verzeichnis','new'=>'Neues Verzeichnis','cr'=>'Erstellen','nm'=>'Name','sz'=>'Größe','tm'=>'Verändert','ac'=>'Aktionen','dl'=>'Download','rn'=>'Umbenennen','cp'=>'Kopieren','mv'=>'Verschieben','rm'=>'Löschen','sh'=>'Teilen','emp'=>'Leer','tip'=>'Aktion bestätigen','lnk'=>'Link','cpl'=>'Link kopieren','ok'=>'OK','cc'=>'Abbrechen','tar'=>'Zielpfad','sh_m'=>'Freigaben-Manager','sh_new'=>'Neue Freigabe','sh_up'=>'Einstellungen aktualisieren','sh_rnd'=>'Zufällig','sh_cus'=>'Benutzerdefiniert','sh_del'=>'Freigabe löschen','sh_ok'=>'Link kopiert','exp'=>'Läuft ab in','uses'=>'Verwendung','unlimited'=>'Unbegrenzt','days'=>'Tage','hours'=>'Stunden','mins'=>'Minuten','max_uses'=>'Maximale Nutzung','set'=>'Einstellungen','link_copied'=>'Link kopiert','exp_never'=>'Nie','exp_1d'=>'1 Tag','exp_7d'=>'7 Tage','exp_30d'=>'30 Tage','uses_1'=>'1 use','uses_5'=>'5 uses','uses_10'=>'10 uses','uses_50'=>'50 uses','custom'=>'Benutzerdefiniert','sharing'=>'Freigaben Einstellungen','save'=>'Speichern','modify'=>'Freigabe verändern','log_title'=>'Nutzungsprotokoll','log_download'=>'Download Protokoll','log_clear'=>'Protokoll zurücksetzen','st_exp'=>'ABGELAUFEN','st_ok'=>'GETEILT','st_wait'=>'WARTEN','stat'=>'Statistik','exp_at'=>'Ablaufdatum','start_at'=>'Beginnt bei','used'=>'Verwendet','delay'=>'Startverzögerung','delay_none'=>'Sofort','delay_10m'=>'In 10 Minute','delay_1h'=>'In 1 Stunde','path_ph'=>'Pfad eingeben und mit Enter bestätigen...','pwd'=>'Passwort','pwd_ph'=>'Empty = Kein Passwort','sel_all'=>'Alle auswählen','batch'=>'Stapelverarbeitung','del_sel'=>'Ausgewählte löschen','drag_tip'=>'Ablegen zum Hochladen']];
+
 if(isset($_GET['l'])){setcookie('l',$_GET['l'],time()+31536000);header("Location: ".BASE.'/'.S_NAME);exit;}
 function T($k){global $L,$lang;return $L[$lang][$k]??$k;}
 
@@ -239,7 +240,7 @@ class Dav {
         if(strpos($u, $this->uri) === 0) {
             $this->req = substr($u, strlen($this->uri));
         } else {
-            $this->req = $u; 
+            $this->req = $u;
         }
         $this->req = empty($this->req) ? '/' : rtrim($this->req, '/');
         $this->path = $this->cleanPath($this->req);
@@ -255,7 +256,7 @@ class Dav {
     }
     private function chk(){if(!isset($_POST['t']) || !hash_equals($_SESSION['t'], $_POST['t'])) die('CSRF');}
     private function isDenied($n){return in_array($n, DENY) || preg_match('/[\/\\\:\*\?"<>\|\x00-\x1F]/', $n);}
-    
+
     private function back($q=''){
         $d = $_POST['cur_dir'] ?? $this->req;
         $pathParts = array_filter(explode('/', trim($d, '/')));
@@ -311,7 +312,7 @@ class Dav {
         if(isset($_FILES['f'])){
             $file_ary = $_FILES['f'];
             $file_count = is_array($file_ary['name']) ? count($file_ary['name']) : 1;
-            
+
             for($i=0; $i<$file_count; $i++) {
                 $n = is_array($file_ary['name']) ? $file_ary['name'][$i] : $file_ary['name'];
                 $tmp = is_array($file_ary['tmp_name']) ? $file_ary['tmp_name'][$i] : $file_ary['tmp_name'];
@@ -329,9 +330,9 @@ class Dav {
             @mkdir($this->path.'/'.$d, 0755, true);
             log_action('CREATE_DIR', 'Dir: '.$d, $u);
         } elseif(isset($_POST['act']) && isset($_POST['n'])){
-            $act = $_POST['act']; 
+            $act = $_POST['act'];
             $names = is_array($_POST['n']) ? $_POST['n'] : [$_POST['n']];
-            
+
             foreach($names as $n) {
                 $n = basename($n);
                 if($this->isDenied($n)) continue;
@@ -363,10 +364,10 @@ class Dav {
                 }
             }
         } elseif(isset($_POST['s_act'])){
-            $sa = $_POST['s_act']; 
+            $sa = $_POST['s_act'];
             $n = basename($_POST['n']??'');
             $rel = str_replace('\\','/', ltrim(substr($this->path.'/'.$n, strlen(S_PATH)), '/\\'));
-            $s = file_exists(SHARE_F) ? include SHARE_F : []; 
+            $s = file_exists(SHARE_F) ? include SHARE_F : [];
             if(!is_array($s)) $s=[];
 
             if($sa === 'c_quick'){
@@ -376,13 +377,13 @@ class Dav {
                 log_action('SHARE_QUICK', 'File: '.$n.' Token: '.$tok, $u);
                 $this->back('?quick='.$tok);
             } elseif($sa === 'c' || $sa === 'u'){
-                $ot = $_POST['otok']??''; 
+                $ot = $_POST['otok']??'';
                 $nt = trim($_POST['ntok']??'');
                 $max = $_POST['max']??0;
-                
+
                 if($sa === 'u' && isset($s[$ot])) unset($s[$ot]);
                 if(empty($nt) || !ctype_alnum($nt) || strlen($nt) > 128 || strlen($nt) < 8) $nt = bin2hex(random_bytes(16));
-                
+
                 if($_POST['exp'] === 'custom'){
                     $v = intval($_POST['exp_custom']??0);
                     $u_exp = $_POST['exp_unit']??'days';
@@ -420,7 +421,7 @@ class Dav {
         }
         $this->back();
     }
-    
+
     // ... WebDAV Methods ...
     private function GET(){
         if(!file_exists($this->path)){http_response_code(404);exit;}
@@ -493,10 +494,10 @@ class Dav {
         $quickS=$_GET['quick']??'';
         $chkSt = function($shr) {
              if(!$shr) return 0;
-             if($shr['expires']>0&&time()>$shr['expires']) return 2; 
-             if($shr['max_uses']>0&&$shr['uses']>=$shr['max_uses']) return 2; 
-             if(isset($shr['start_ts']) && $shr['start_ts']>time()) return 3; 
-             return 1; 
+             if($shr['expires']>0&&time()>$shr['expires']) return 2;
+             if($shr['max_uses']>0&&$shr['uses']>=$shr['max_uses']) return 2;
+             if(isset($shr['start_ts']) && $shr['start_ts']>time()) return 3;
+             return 1;
         };
         $I=['f'=>'<svg class="i" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg>','d'=>'<svg class="i" viewBox="0 0 24 24" style="color:#facc15"><path fill="currentColor" d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>','dl'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>','sh'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>','ed'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>','cp'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>','mv'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/></svg>','rm'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>','log'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>','bat'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>','up_f'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10zm-7.01-5l-1.41-1.41 2.01-2.01h-2.83v-2h2.83l-2.01-2.01 1.41-1.41 4.42 4.42-4.42 4.42z"/></svg>'];
         ?><!DOCTYPE html><html lang="<?=$lang?>"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>EasyWebDAV</title>
@@ -579,7 +580,7 @@ class Dav {
         .drop-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(92,107,192,0.9);z-index:999;display:none;justify-content:center;align-items:center;flex-direction:column;color:#fff;font-size:24px;font-weight:bold;backdrop-filter:blur(5px)}
         .drop-active .drop-overlay{display:flex}
         .emp-msg { text-align:center; padding: 60px 20px; color:#78909c; font-style:italic; font-size:16px; border-bottom:none; height: 300px; vertical-align:middle; }
-        </style></head><body class="<?=$_COOKIE['dk']??''?>">
+        </style></head><body class="<?=$_COOKIE['dk']??'dark'?>">
         <div class="drop-overlay"><div><?=T('drag_tip')?></div></div>
         <div class="box">
         <header>
@@ -591,7 +592,7 @@ class Dav {
             <div style="display:flex;gap:14px;align-items:center">
                 <?php if(LOG_ENABLED): ?><a href="#" onclick="showLogs()" class="ab" title="<?=T('log_title')?>" style="padding:8px"><?=$I['log']?></a><?php endif; ?>
                 <button class="tg" onclick="mode()"><svg class="float-icon" width="24" height="24" viewBox="0 0 24 24" fill="#FDB813"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
-                <div style="font-size:13px;font-weight:600"><a href="?l=cn" style="text-decoration:none;color:<?=$lang=='cn'?'var(--p)':'#78909c'?>">CN</a> <span style="color:#cfd8dc">|</span> <a href="?l=en" style="text-decoration:none;color:<?=$lang=='en'?'var(--p)':'#78909c'?>">EN</a></div>
+                <div style="font-size:13px;font-weight:600"><a href="?l=de" style="text-decoration:none;color:<?=$lang=='de'?'var(--p)':'#78909c'?>">DE</a> <span style="color:#cfd8dc">|</span><a href="?l=cn" style="text-decoration:none;color:<?=$lang=='cn'?'var(--p)':'#78909c'?>">CN</a> <span style="color:#cfd8dc">|</span> <a href="?l=en" style="text-decoration:none;color:<?=$lang=='en'?'var(--p)':'#78909c'?>">EN</a></div>
             </div>
         </header>
         <div class="bar">
@@ -621,7 +622,7 @@ class Dav {
                 </tr></thead>
                 <tbody>
                     <?php if(count($l)<=2): ?><tr><td colspan="5" class="emp-msg"><?=T('emp')?></td></tr>
-                    <?php else: foreach($l as $f): if($this->isDenied($f))continue; $p=$this->path.'/'.$f; $d=is_dir($p); $lk=$this->uri.rtrim($this->req,'/').'/'.rawurlencode($f); $rp=str_replace('\\','/',ltrim(substr($p,strlen(S_PATH)),'/\\')); $shr=isset($sm[$rp])?$sh[$sm[$rp]]:null; 
+                    <?php else: foreach($l as $f): if($this->isDenied($f))continue; $p=$this->path.'/'.$f; $d=is_dir($p); $lk=$this->uri.rtrim($this->req,'/').'/'.rawurlencode($f); $rp=str_replace('\\','/',ltrim(substr($p,strlen(S_PATH)),'/\\')); $shr=isset($sm[$rp])?$sh[$sm[$rp]]:null;
                     $sTok=$shr?$sm[$rp]:''; $st=$chkSt($shr); $stCls=['','ok','exp','wait']; $stTxt=['',T('st_ok'),T('st_exp'),T('st_wait')]; ?>
                     <tr>
                         <td style="padding-right:0"><input type="checkbox" class="chk sel-item" value="<?=htmlspecialchars($f)?>" onchange="updB()"></td>
@@ -654,11 +655,11 @@ class Dav {
         function cl(){$('md').style.display='none';if($('logModal')) $('logModal').style.display='none';}
         function pf(h){const f=document.createElement('form');f.style.display='none';f.method='post';f.innerHTML=h+'<input type="hidden" name="cur_dir" value="'+cur+'">';document.body.appendChild(f);f.submit();}
         function goToPath(p){p=p.replace(/\\/g,'/').replace(/^\/+|\/+$/g,'');let parts=p.split('/');let enc=parts.map(encodeURIComponent).join('/');window.location.href=base+'/'+'<?=S_NAME?>'+'/'+enc;}
-        
+
         function toggleAll(el){document.querySelectorAll('.sel-item').forEach(c=>{c.checked=el.checked});updB();}
         function updB(){let n=document.querySelectorAll('.sel-item:checked').length;$('batch_acts').style.display=n>0?'flex':'none';}
         function getSel(){return Array.from(document.querySelectorAll('.sel-item:checked')).map(c=>c.value);}
-        
+
         function p(a,n){
             let items = n ? [n] : getSel();
             if(items.length===0) return;
@@ -695,7 +696,7 @@ class Dav {
             h+=`<div class="form-group"><label class="form-label"><?=T('delay')?></label><select id="delay" class="form-select"><option value="0"><?=T('delay_none')?></option><option value="600"><?=T('delay_10m')?></option><option value="3600"><?=T('delay_1h')?></option><option value="custom"><?=T('custom')?></option></select><div id="custDelay" class="custom-options"><div class="form-row"><input id="delayVal" type="number" min="1" value="30" class="form-input" placeholder="Value"><select id="delayUnit" class="form-select" style="width:120px"><option value="mins"><?=T('mins')?></option><option value="hours"><?=T('hours')?></option></select></div></div></div>`;
             h+=`<div class="form-group"><label class="form-label"><?=T('max_uses')?></label><select id="max" class="form-select"><option value="0"><?=T('unlimited')?></option><option value="1"><?=T('uses_1')?></option><option value="5"><?=T('uses_5')?></option><option value="10"><?=T('uses_10')?></option><option value="50"><?=T('uses_50')?></option><option value="custom"><?=T('custom')?></option></select><div id="custMax" class="custom-options"><input id="maxVal" type="number" min="1" value="10" class="form-input" placeholder="Count"></div></div>`;
             h+=`<div class="form-group"><label class="form-label"><?=T('pwd')?></label><input id="pwd" class="form-input" placeholder="<?=T('pwd_ph')?>"></div></div></div>`;
-            
+
             $('mc').innerHTML=h;$('mok').style.display='none';
             if(t){
                 let stdExps=[0,86400,604800,2592000], now=Math.floor(Date.now()/1000), diff=expAt>0?expAt-now:0;
