@@ -67,6 +67,30 @@ function log_action($action, $details='', $user='', $st='success'){
   @file_put_contents(LOG_PATH.'/'.date('Y-m-d').'.log', $log, FILE_APPEND | LOCK_EX);
 }
 
+function loadAuthData(){
+  if(!file_exists(AUTH_F)) return null;
+  $ac = include AUTH_F;
+  // Backward compatibility: convert old single-user format to new multi-user format
+  if(isset($ac['u']) && isset($ac['h']) && !isset($ac['users'])){
+    $ac = ['users' => [$ac['u'] => $ac['h']], 'admin' => $ac['u']];
+    @file_put_contents(AUTH_F, "<?php\nreturn ".var_export($ac, true).";");
+    @chmod(AUTH_F, 0600);
+  }
+  return $ac;
+}
+
+function saveAuthData($ac){
+  @file_put_contents(AUTH_F, "<?php\nreturn ".var_export($ac, true).";");
+  @chmod(AUTH_F, 0600);
+}
+
+function authenticateUser($username, $password){
+  $ac = loadAuthData();
+  if(!$ac || !isset($ac['users'])) return false;
+  if(!isset($ac['users'][$username])) return false;
+  return password_verify($password, $ac['users'][$username]);
+}
+
 // --- Share Link Logic (Run before Auth) ---
 $shareToken = '';
 if(preg_match('#/s/([a-zA-Z0-9]{8,})(?:/|$)#', $_SERVER['REQUEST_URI'], $m)) {
@@ -204,9 +228,12 @@ if($shareToken && ctype_alnum($shareToken)) {
 // --- Authentication ---
 if(!file_exists(AUTH_F)) {
   if(!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
-    @file_put_contents(AUTH_F, "<?php\nreturn ".var_export(['u'=>$_SERVER['PHP_AUTH_USER'],'h'=>password_hash($_SERVER['PHP_AUTH_PW'],PASSWORD_DEFAULT)],true).";");
-    @chmod(AUTH_F, 0600);
     log_action('INITIAL_SETUP', 'User: '.$_SERVER['PHP_AUTH_USER'], 'system');
+    $initialUser = $_SERVER['PHP_AUTH_USER'];
+    $initialHash = password_hash($_SERVER['PHP_AUTH_PW'], PASSWORD_DEFAULT);
+    $ac = ['users' => [$initialUser => $initialHash], 'admin' => $initialUser];
+    saveAuthData($ac);
+    log_action('INITIAL_SETUP', 'User: '.$initialUser, 'system');
   } else {
     header('WWW-Authenticate: Basic realm="Install"');
     header('HTTP/1.0 401 Unauthorized');
@@ -214,14 +241,16 @@ if(!file_exists(AUTH_F)) {
   }
 }
 
-$ac = include AUTH_F;
+$ac = loadAuthData();
 $u = $_SERVER['PHP_AUTH_USER'] ?? '';
 $p = $_SERVER['PHP_AUTH_PW'] ?? '';
 
-if($u !== $ac['u'] || !password_verify($p, $ac['h'])) {
+if(!authenticateUser($u, $p)) {
   $h = $_SERVER['HTTP_AUTHORIZATION'] ?? ($_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '');
-  if($h && preg_match('/Basic\s+(.*)$/i', $h, $m)) list($u, $p) = explode(':', base64_decode($m[1]), 2);
-  if($u !== $ac['u'] || !password_verify($p, $ac['h'])) {
+  if($h && preg_match('/Basic\s+(.*)$/i', $h, $m)) {
+    list($u, $p) = explode(':', base64_decode($m[1]), 2);
+  }
+  if(!authenticateUser($u, $p)) {
     log_action('AUTH_FAILED', 'User: ' . $u, $u, 'failed');
     header('WWW-Authenticate: Basic realm="EasyWebDAV"');
     header('HTTP/1.0 401 Unauthorized');
@@ -230,6 +259,8 @@ if($u !== $ac['u'] || !password_verify($p, $ac['h'])) {
 }
 
 log_action('LOGIN', 'User: '.$u, $u);
+//$isAdmin = isset($ac['admin']) && $ac['admin'] === $u;
+$isAdmin = (isset($ac['admin']) && !empty($ac['admin']) && $ac['admin'] === $u);
 
 // --- UI & Translation ---
 $lang = $_COOKIE['l'] ?? 'de';
@@ -307,6 +338,15 @@ $L = [
     'batch' => '批量操作',
     'del_sel' => '删除选中',
     'drag_tip' => '释放以上传文件',
+    'user_m' => 'Benutzerverwaltung',
+    'user_add' => 'Benutzer hinzufügen',
+    'user_del' => 'Benutzer löschen',
+    'user_chpass' => 'Passwort ändern',
+    'user_admin' => 'Als Admin setzen',
+    'user_name' => 'Benutzername',
+    'user_pass' => 'Passwort',
+    'user_list' => 'Benutzer',
+    'user_current' => 'Aktueller Benutzer'
   ],
   'en' => [
     'home' => 'Home',
@@ -381,6 +421,15 @@ $L = [
     'batch' => 'Batch',
     'del_sel' => 'Delete Selected',
     'drag_tip' => 'Drop to Upload',
+    'user_m' => 'Benutzerverwaltung',
+    'user_add' => 'Benutzer hinzufügen',
+    'user_del' => 'Benutzer löschen',
+    'user_chpass' => 'Passwort ändern',
+    'user_admin' => 'Als Admin setzen',
+    'user_name' => 'Benutzername',
+    'user_pass' => 'Passwort',
+    'user_list' => 'Benutzer',
+    'user_current' => 'Aktueller Benutzer'
   ],
   'de' => [
     'home' => 'Start',
@@ -455,6 +504,15 @@ $L = [
     'batch' => 'Stapelverarbeitung',
     'del_sel' => 'Ausgewählte löschen',
     'drag_tip' => 'Ablegen zum Hochladen',
+    'user_m' => 'Benutzerverwaltung',
+    'user_add' => 'Benutzer hinzufügen',
+    'user_del' => 'Benutzer löschen',
+    'user_chpass' => 'Passwort ändern',
+    'user_admin' => 'Als Admin setzen',
+    'user_name' => 'Benutzername',
+    'user_pass' => 'Passwort',
+    'user_list' => 'Benutzer',
+    'user_current' => 'Aktueller Benutzer'
   ]
 ];
 
@@ -607,7 +665,7 @@ class Dav {
   }
 
   public function handleBrowser() {
-    $this->chk(); global $u;
+    $this->chk(); global $u, $isAdmin;
     if(isset($_FILES['f'])) {
       $file_ary = $_FILES['f'];
       $file_count = is_array($file_ary['name']) ? count($file_ary['name']) : 1;
@@ -717,7 +775,43 @@ class Dav {
         @file_put_contents(SHARE_F, "<?php\nreturn ".var_export($s,true).";", LOCK_EX);
         log_action('SHARE_DELETE', 'Token: '.$ot, $u);
       }
+    } elseif(isset($_POST['user_act']) && $isAdmin){
+      $ua = $_POST['user_act'];
+      $ac = loadAuthData();
+
+      if($ua === 'add'){
+        $newUser = trim($_POST['new_user']??'');
+        $newPass = $_POST['new_pass']??'';
+        if($newUser && $newPass && !isset($ac['users'][$newUser]) && preg_match('/^[a-zA-Z0-9_\-]+$/', $newUser)){
+          $ac['users'][$newUser] = password_hash($newPass, PASSWORD_DEFAULT);
+          saveAuthData($ac);
+          log_action('USER_ADD', 'User: '.$newUser, $u);
+        }
+      } elseif($ua === 'delete'){
+        $delUser = trim($_POST['del_user']??'');
+        if($delUser && isset($ac['users'][$delUser]) && $delUser !== $ac['admin']){
+          unset($ac['users'][$delUser]);
+          saveAuthData($ac);
+          log_action('USER_DELETE', 'User: '.$delUser, $u);
+        }
+      } elseif($ua === 'chpass'){
+        $chUser = trim($_POST['ch_user']??'');
+        $chPass = $_POST['ch_pass']??'';
+        if($chUser && $chPass && isset($ac['users'][$chUser])){
+          $ac['users'][$chUser] = password_hash($chPass, PASSWORD_DEFAULT);
+          saveAuthData($ac);
+          log_action('USER_CHPASS', 'User: '.$chUser, $u);
+        }
+      } elseif($ua === 'setadmin'){
+        $newAdmin = trim($_POST['new_admin']??'');
+        if($newAdmin && isset($ac['users'][$newAdmin])){
+          $ac['admin'] = $newAdmin;
+          saveAuthData($ac);
+          log_action('USER_SETADMIN', 'New admin: '.$newAdmin, $u);
+        }
+      }
     }
+
     $this->back();
   }
 
@@ -914,23 +1008,36 @@ class Dav {
     }
   }
 
-  private function mime($f)  {
-    $x = strtolower(pathinfo($f, 4));
-    $m = [
-      'txt'=>'text/plain',
-      'html'=>'text/html',
-      'css'=>'text/css',
-      'js'=>'application/javascript',
-      'json'=>'application/json',
-      'jpg'=>'image/jpeg',
-      'jpeg'=>'image/jpeg',
-      'png'=>'image/png',
-      'gif'=>'image/gif',
-      'mp4'=>'video/mp4',
-      'pdf'=>'application/pdf',
-      'zip'=>'application/zip'
+  private function mime($f) {
+    if (file_exists($f) && function_exists('finfo_open')) {
+      $finfo = finfo_open(FILEINFO_MIME_TYPE);
+      $mime = finfo_file($finfo, $f);
+
+      // fix deprecation finfo_close in php 8.5 and higher
+      if (version_compare(PHP_VERSION, '8.5.0', '<')) {
+        finfo_close($finfo);
+      }
+
+      if ($mime) return $mime;
+    }
+
+    $ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
+    $map = [
+      'txt' => 'text/plain',
+      'html' => 'text/html',
+      'css' => 'text/css',
+      'js' => 'application/javascript',
+      'json' => 'application/json',
+      'jpg' => 'image/jpeg',
+      'jpeg' => 'image/jpeg',
+      'png' => 'image/png',
+      'gif' => 'image/gif',
+      'mp4' => 'video/mp4',
+      'pdf' => 'application/pdf',
+      'zip' => 'application/zip'
     ];
-    return $m[$x] ?? 'application/octet-stream';
+
+    return $map[$ext] ?? 'application/octet-stream';
   }
 
   private function size($b) {
@@ -1093,6 +1200,7 @@ class Dav {
         </div>
         <div style="display:flex;gap:14px;align-items:center">
           <?php if(LOG_ENABLED): ?><a href="#" onclick="showLogs()" class="ab" title="<?= T('log_title') ?>" style="padding:8px"><?= $I['log'] ?></a><?php endif; ?>
+          <?php if($isAdmin): ?><a href="#" onclick="showUsers()" class="ab" title="<?=T('user_m')?>" style="padding:8px"><?=$ICONS['user']?></a><?php endif; ?>
           <button class="tg" onclick="mode()">
             <svg class="float-icon" width="24" height="24" viewBox="0 0 24 24" fill="#FDB813">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -1246,6 +1354,62 @@ class Dav {
 
       function showLogs() {
         if($('logModal')) $('logModal').style.display='flex';
+      }
+
+      function showUsers(){
+        $('md').style.display='flex';
+        $('mb_cnt').className='mb';
+        $('mt').innerText='<?=T('user_m')?>';
+
+        const users = <?=json_encode(array_keys($ac['users']??[]))?>;
+        const admin = '<?=$ac['admin']??''?>';
+        const currentUser = '<?=$u?>';
+
+        let h = '<div class="form-group"><label class="form-label"><?=T('user_list')?></label><div style="max-height:200px;overflow-y:auto;border:1px solid var(--bd);border-radius:8px;padding:8px">';
+        users.forEach(user => {
+          const isAdmin = user === admin;
+          h += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--bd)"><span>${user}${user===currentUser?' <span style="color:var(--p)">(<?=T('user_current')?>)</span>':''}${isAdmin?' <span class="badge ok">Admin</span>':''}</span><div>`;
+          if(!isAdmin){
+            h += `<button class="ab" onclick="userAction('chpass','${user}')" title="<?=T('user_chpass')?>"><?=$ICONS['ed']?></button>`;
+            h += `<button class="ab" onclick="userAction('setadmin','${user}')" title="<?=T('user_admin')?>"><?=$ICONS['user']?></button>`;
+            if(user !== currentUser){
+              h += `<button class="ab del" onclick="userAction('delete','${user}')" title="<?=T('user_del')?>"><?=$ICONS['delete']?></button>`;
+            }
+          }
+          h += '</div></div>';
+        });
+        h += '</div></div>';
+
+        h += '<div class="form-group"><label class="form-label"><?=T('user_add')?></label>';
+        h += '<div class="form-row"><input id="new_user" class="form-input" placeholder="<?=T('user_name')?>"><input id="new_pass" type="password" class="form-input" placeholder="<?=T('user_pass')?>"><button class="btn bp" onclick="userAction(\'add\')"><?=T('user_add')?></button></div></div>';
+
+        $('mc').innerHTML = h;
+        $('mok').style.display='none';
+      }
+
+      function userAction(action, username){
+        if(action === 'add'){
+          const newUser = $('new_user').value.trim();
+          const newPass = $('new_pass').value;
+          if(!newUser || !newPass){
+            showToast('<?=T('user_name')?> and <?=T('user_pass')?> required');
+            return;
+          }
+          pf('<input type="hidden" name="t" value="'+csrf+'"><input name="user_act" value="add"><input name="new_user" value="'+newUser.replace(/"/g,'&quot;')+'"><input name="new_pass" value="'+newPass.replace(/"/g,'&quot;')+'">');
+        } else if(action === 'delete'){
+          if(confirm('<?=T('tip')?> '+username+'?')){
+            pf('<input type="hidden" name="t" value="'+csrf+'"><input name="user_act" value="delete"><input name="del_user" value="'+username.replace(/"/g,'&quot;')+'">');
+          }
+        } else if(action === 'chpass'){
+          const newPass = prompt('<?=T('user_pass')?>:');
+          if(newPass){
+            pf('<input type="hidden" name="t" value="'+csrf+'"><input name="user_act" value="chpass"><input name="ch_user" value="'+username.replace(/"/g,'&quot;')+'"><input name="ch_pass" value="'+newPass.replace(/"/g,'&quot;')+'">');
+          }
+        } else if(action === 'setadmin'){
+          if(confirm('Set '+username+' as admin?')){
+            pf('<input type="hidden" name="t" value="'+csrf+'"><input name="user_act" value="setadmin"><input name="new_admin" value="'+username.replace(/"/g,'&quot;')+'">');
+          }
+        }
       }
 
       function cl() {
