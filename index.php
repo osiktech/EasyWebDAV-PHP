@@ -211,7 +211,7 @@ log_action('LOGIN', 'User: '.$u, $u);
 
 // --- UI & Translation ---
 $lang = $_COOKIE['l'] ?? 'de';
-$L=['cn'=> ['home'=>'首页','back'=>'返回上级','up'=>'上传文件','up_folder'=>'文件夹','new'=>'新建文件夹','cr'=>'创建','nm'=>'名称','sz'=>'大小','tm'=>'修改时间','ac'=>'操作','dl'=>'下载','rename'=>'重命名','copy'=>'复制','move'=>'移动','delete'=>'删除','share'=>'分享','emp'=>'空目录','tip'=>'确认执行操作','lnk'=>'直链地址','cpl'=>'复制链接','ok'=>'确定','cc'=>'取消','tar'=>'目标路径','sh_m'=>'分享管理','sh_new'=>'新建分享','sh_up'=>'更新设置','sh_rnd'=>'随机生成','sh_cus'=>'自定义','sh_del'=>'取消分享','sh_ok'=>'链接已复制','exp'=>'有效期','uses'=>'使用情况','unlimited'=>'无限制','days'=>'天','hours'=>'小时','mins'=>'分钟','max_uses'=>'最大次数','set'=>'设置','link_copied'=>'链接已复制','exp_never'=>'永不过期','exp_1d'=>'1天','exp_7d'=>'7天','exp_30d'=>'30天','uses_1'=>'1次','uses_5'=>'5次','uses_10'=>'10次','uses_50'=>'50次','custom'=>'自定义','sharing'=>'分享设置','save'=>'保存','modify'=>'修改配置','log_title'=>'操作日志','log_download'=>'下载日志','log_clear'=>'清空日志','st_exp'=>'已过期','st_ok'=>'分享中','st_wait'=>'未开始','stat'=>'统计信息','exp_at'=>'到期时间','start_at'=>'生效时间','used'=>'已用','delay'=>'生效延时','delay_none'=>'立即生效','delay_10m'=>'10分钟后','delay_1h'=>'1小时后','path_ph'=>'输入路径按回车跳转...','pwd'=>'访问密码','pwd_ph'=>'留空则无密码','sel_all'=>'全选','batch'=>'批量操作','del_sel'=>'删除选中','drag_tip'=>'释放以上传文件'],'en'=>['home'=>'Home','back'=>'Back','up'=>'Upload File','up_folder'=>'Folder','new'=>'New Folder','cr'=>'Create','nm'=>'Name','sz'=>'Size','tm'=>'Modified','ac'=>'Actions','dl'=>'Download','rename'=>'Rename','copy'=>'Copy','move'=>'Move','delete'=>'Delete','share'=>'Share','emp'=>'Empty','tip'=>'Confirm Action','lnk'=>'Link','cpl'=>'Copy Link','ok'=>'OK','cc'=>'Cancel','tar'=>'Target Path','sh_m'=>'Share Manager','sh_new'=>'New Share','sh_up'=>'Update Settings','sh_rnd'=>'Random','sh_cus'=>'Custom','sh_del'=>'Unshare','sh_ok'=>'Link Copied','exp'=>'Expires In','uses'=>'Usage','unlimited'=>'Unlimited','days'=>'days','hours'=>'hours','mins'=>'minutes','max_uses'=>'Max Uses','set'=>'Settings','link_copied'=>'Link copied','exp_never'=>'Never','exp_1d'=>'1 day','exp_7d'=>'7 days','exp_30d'=>'30 days','uses_1'=>'1 use','uses_5'=>'5 uses','uses_10'=>'10 uses','uses_50'=>'50 uses','custom'=>'Custom','sharing'=>'Sharing Settings','save'=>'Save','modify'=>'Modify Share','log_title'=>'Operation Logs','log_download'=>'Download Log','log_clear'=>'Clear Log','st_exp'=>'EXPIRED','st_ok'=>'SHARED','st_wait'=>'WAITING','stat'=>'Statistics','exp_at'=>'Expires At','start_at'=>'Starts At','used'=>'Used','delay'=>'Start Delay','delay_none'=>'Immediate','delay_10m'=>'In 10 mins','delay_1h'=>'In 1 hour','path_ph'=>'Type path and hit Enter...','pwd'=>'Password','pwd_ph'=>'Empty = No Password','sel_all'=>'Select All','batch'=>'Batch','del_sel'=>'Delete Selected','drag_tip'=>'Drop to Upload'],'de'=>['home'=>'Start','back'=>'Zurück','up'=>'Datei hochladen','up_folder'=>'Verzeichnis hochladen','new'=>'Neues Verzeichnis','cr'=>'Erstellen','nm'=>'Name','sz'=>'Größe','tm'=>'Verändert','ac'=>'Aktionen','dl'=>'Download','rename'=>'Umbenennen','copy'=>'Kopieren','move'=>'Verschieben','delete'=>'Löschen','share'=>'Teilen','emp'=>'Leer','tip'=>'Aktion bestätigen','lnk'=>'Link','cpl'=>'Link kopieren','ok'=>'OK','cc'=>'Abbrechen','tar'=>'Zielpfad','sh_m'=>'Freigaben-Manager','sh_new'=>'Neue Freigabe','sh_up'=>'Einstellungen aktualisieren','sh_rnd'=>'Zufällig','sh_cus'=>'Benutzerdefiniert','sh_del'=>'Freigabe löschen','sh_ok'=>'Link kopiert','exp'=>'Läuft ab in','uses'=>'Verwendung','unlimited'=>'Unbegrenzt','days'=>'Tage','hours'=>'Stunden','mins'=>'Minuten','max_uses'=>'Maximale Nutzung','set'=>'Einstellungen','link_copied'=>'Link kopiert','exp_never'=>'Nie','exp_1d'=>'1 Tag','exp_7d'=>'7 Tage','exp_30d'=>'30 Tage','uses_1'=>'1 use','uses_5'=>'5 uses','uses_10'=>'10 uses','uses_50'=>'50 uses','custom'=>'Benutzerdefiniert','sharing'=>'Freigaben Einstellungen','save'=>'Speichern','modify'=>'Freigabe verändern','log_title'=>'Nutzungsprotokoll','log_download'=>'Download Protokoll','log_clear'=>'Protokoll zurücksetzen','st_exp'=>'ABGELAUFEN','st_ok'=>'GETEILT','st_wait'=>'WARTEN','stat'=>'Statistik','exp_at'=>'Ablaufdatum','start_at'=>'Beginnt bei','used'=>'Verwendet','delay'=>'Startverzögerung','delay_none'=>'Sofort','delay_10m'=>'In 10 Minute','delay_1h'=>'In 1 Stunde','path_ph'=>'Pfad eingeben und mit Enter bestätigen...','pwd'=>'Passwort','pwd_ph'=>'Empty = Kein Passwort','sel_all'=>'Alle auswählen','batch'=>'Stapelverarbeitung','del_sel'=>'Ausgewählte löschen','drag_tip'=>'Ablegen zum Hochladen']];
+$L=['cn'=> ['home'=>'首页','back'=>'返回上级','up'=>'上传文件','up_folder'=>'文件夹','new'=>'新建文件夹','cr'=>'创建','nm'=>'名称','sz'=>'大小','tm'=>'修改时间','ac'=>'操作','download'=>'下载','rename'=>'重命名','copy'=>'复制','move'=>'移动','delete'=>'删除','share'=>'分享','emp'=>'空目录','tip'=>'确认执行操作','lnk'=>'直链地址','cpl'=>'复制链接','ok'=>'确定','cc'=>'取消','tar'=>'目标路径','sh_m'=>'分享管理','sh_new'=>'新建分享','sh_up'=>'更新设置','sh_rnd'=>'随机生成','sh_cus'=>'自定义','sh_del'=>'取消分享','sh_ok'=>'链接已复制','exp'=>'有效期','uses'=>'使用情况','unlimited'=>'无限制','days'=>'天','hours'=>'小时','mins'=>'分钟','max_uses'=>'最大次数','set'=>'设置','link_copied'=>'链接已复制','exp_never'=>'永不过期','exp_1d'=>'1天','exp_7d'=>'7天','exp_30d'=>'30天','uses_1'=>'1次','uses_5'=>'5次','uses_10'=>'10次','uses_50'=>'50次','custom'=>'自定义','sharing'=>'分享设置','save'=>'保存','modify'=>'修改配置','log_title'=>'操作日志','log_download'=>'下载日志','log_clear'=>'清空日志','st_exp'=>'已过期','st_ok'=>'分享中','st_wait'=>'未开始','stat'=>'统计信息','exp_at'=>'到期时间','start_at'=>'生效时间','used'=>'已用','delay'=>'生效延时','delay_none'=>'立即生效','delay_10m'=>'10分钟后','delay_1h'=>'1小时后','path_ph'=>'输入路径按回车跳转...','pwd'=>'访问密码','pwd_ph'=>'留空则无密码','sel_all'=>'全选','batch'=>'批量操作','del_sel'=>'删除选中','drag_tip'=>'释放以上传文件'],'en'=>['home'=>'Home','back'=>'Back','up'=>'Upload File','up_folder'=>'Folder','new'=>'New Folder','cr'=>'Create','nm'=>'Name','sz'=>'Size','tm'=>'Modified','ac'=>'Actions','download'=>'Download','rename'=>'Rename','copy'=>'Copy','move'=>'Move','delete'=>'Delete','share'=>'Share','emp'=>'Empty','tip'=>'Confirm Action','lnk'=>'Link','cpl'=>'Copy Link','ok'=>'OK','cc'=>'Cancel','tar'=>'Target Path','sh_m'=>'Share Manager','sh_new'=>'New Share','sh_up'=>'Update Settings','sh_rnd'=>'Random','sh_cus'=>'Custom','sh_del'=>'Unshare','sh_ok'=>'Link Copied','exp'=>'Expires In','uses'=>'Usage','unlimited'=>'Unlimited','days'=>'days','hours'=>'hours','mins'=>'minutes','max_uses'=>'Max Uses','set'=>'Settings','link_copied'=>'Link copied','exp_never'=>'Never','exp_1d'=>'1 day','exp_7d'=>'7 days','exp_30d'=>'30 days','uses_1'=>'1 use','uses_5'=>'5 uses','uses_10'=>'10 uses','uses_50'=>'50 uses','custom'=>'Custom','sharing'=>'Sharing Settings','save'=>'Save','modify'=>'Modify Share','log_title'=>'Operation Logs','log_download'=>'Download Log','log_clear'=>'Clear Log','st_exp'=>'EXPIRED','st_ok'=>'SHARED','st_wait'=>'WAITING','stat'=>'Statistics','exp_at'=>'Expires At','start_at'=>'Starts At','used'=>'Used','delay'=>'Start Delay','delay_none'=>'Immediate','delay_10m'=>'In 10 mins','delay_1h'=>'In 1 hour','path_ph'=>'Type path and hit Enter...','pwd'=>'Password','pwd_ph'=>'Empty = No Password','sel_all'=>'Select All','batch'=>'Batch','del_sel'=>'Delete Selected','drag_tip'=>'Drop to Upload'],'de'=>['home'=>'Start','back'=>'Zurück','up'=>'Datei hochladen','up_folder'=>'Verzeichnis hochladen','new'=>'Neues Verzeichnis','cr'=>'Erstellen','nm'=>'Name','sz'=>'Größe','tm'=>'Verändert','ac'=>'Aktionen','download'=>'Download','rename'=>'Umbenennen','copy'=>'Kopieren','move'=>'Verschieben','delete'=>'Löschen','share'=>'Teilen','emp'=>'Leer','tip'=>'Aktion bestätigen','lnk'=>'Link','cpl'=>'Link kopieren','ok'=>'OK','cc'=>'Abbrechen','tar'=>'Zielpfad','sh_m'=>'Freigaben-Manager','sh_new'=>'Neue Freigabe','sh_up'=>'Einstellungen aktualisieren','sh_rnd'=>'Zufällig','sh_cus'=>'Benutzerdefiniert','sh_del'=>'Freigabe löschen','sh_ok'=>'Link kopiert','exp'=>'Läuft ab in','uses'=>'Verwendung','unlimited'=>'Unbegrenzt','days'=>'Tage','hours'=>'Stunden','mins'=>'Minuten','max_uses'=>'Maximale Nutzung','set'=>'Einstellungen','link_copied'=>'Link kopiert','exp_never'=>'Nie','exp_1d'=>'1 Tag','exp_7d'=>'7 Tage','exp_30d'=>'30 Tage','uses_1'=>'1 use','uses_5'=>'5 uses','uses_10'=>'10 uses','uses_50'=>'50 uses','custom'=>'Benutzerdefiniert','sharing'=>'Freigaben Einstellungen','save'=>'Speichern','modify'=>'Freigabe verändern','log_title'=>'Nutzungsprotokoll','log_download'=>'Download Protokoll','log_clear'=>'Protokoll zurücksetzen','st_exp'=>'ABGELAUFEN','st_ok'=>'GETEILT','st_wait'=>'WARTEN','stat'=>'Statistik','exp_at'=>'Ablaufdatum','start_at'=>'Beginnt bei','used'=>'Verwendet','delay'=>'Startverzögerung','delay_none'=>'Sofort','delay_10m'=>'In 10 Minute','delay_1h'=>'In 1 Stunde','path_ph'=>'Pfad eingeben und mit Enter bestätigen...','pwd'=>'Passwort','pwd_ph'=>'Empty = Kein Passwort','sel_all'=>'Alle auswählen','batch'=>'Stapelverarbeitung','del_sel'=>'Ausgewählte löschen','drag_tip'=>'Ablegen zum Hochladen']];
 
 if(isset($_GET['l'])){setcookie('l',$_GET['l'],time()+31536000);header("Location: ".BASE.'/'.S_NAME);exit;}
 function T($k){global $L,$lang;return $L[$lang][$k]??$k;}
@@ -315,25 +315,128 @@ class Dav {
     }
   }
 
+  private function normalizePath($path){
+    $path = str_replace("\0", '', $path);
+    $path = str_replace('\\', '/', $path);
+    $path = preg_replace('#/+#','/',$path);
+    $path = ltrim($path,'/');
+
+    // block traversal
+    if(strpos($path, '../') !== false || $path === '..'){
+        return false;
+    }
+    return $path;
+  }
+
+  private function ensureInsideRoot($fullPath){
+    $root = realpath($this->path);
+    if(!$root) return false;
+
+    $dir = dirname($fullPath);
+    $realDir = realpath($dir);
+
+    // If directory doesn't exist yet, check if it would be inside root when created
+    if(!$realDir) {
+      // Check if the path starts with the root path
+      return strpos($dir, $root) === 0 || strpos(str_replace('\\', '/', $dir), str_replace('\\', '/', $root)) === 0;
+    }
+
+    return strpos($realDir, $root) === 0;
+  }
+
   public function handleBrowser(){
     $this->chk(); global $u;
     if(isset($_FILES['f'])){
       $file_ary = $_FILES['f'];
-      $file_count = is_array($file_ary['name']) ? count($file_ary['name']) : 1;
 
-      for($i=0; $i<$file_count; $i++) {
-        $n = is_array($file_ary['name']) ? $file_ary['name'][$i] : $file_ary['name'];
-        $tmp = is_array($file_ary['tmp_name']) ? $file_ary['tmp_name'][$i] : $file_ary['tmp_name'];
-        $err = is_array($file_ary['error']) ? $file_ary['error'][$i] : $file_ary['error'];
+      // Handle both single file and array of files
+      $isArray = is_array($file_ary['name']);
+      $file_count = $isArray ? count($file_ary['name']) : 1;
 
-        if($err === UPLOAD_ERR_OK && !$this->isDenied($n)){
-          $target = $this->path.'/'.$n;
-          if(move_uploaded_file($tmp, $target)){
-            @chmod($target, 0644);
-            log_action('UPLOAD', 'File: '.$n, $u);
+      // Also check for alternative path parameter (for Firefox drag-and-drop workaround)
+      $pathOverrides = isset($_POST['f_path']) ? $_POST['f_path'] : [];
+      if(!is_array($pathOverrides)) $pathOverrides = [];
+
+      for($i=0; $i<$file_count; $i++){
+
+        // Handle both array and single file formats
+        $rawName = $isArray ? $file_ary['name'][$i] : $file_ary['name'];
+        $tmp = $isArray ? $file_ary['tmp_name'][$i] : $file_ary['tmp_name'];
+        $fileSize = $isArray ? $file_ary['size'][$i] : $file_ary['size'];
+
+        // Use override path if provided (for Firefox drag-and-drop)
+        if(isset($pathOverrides[$i]) && !empty($pathOverrides[$i])){
+          $rawName = $pathOverrides[$i];
+        }
+
+        // Log what we receive for debugging (especially for Firefox webkitdirectory)
+        // Always log to see what Firefox actually sends
+        if(LOG_ENABLED) {
+          log_action('UPLOAD_DEBUG', 'File '.$i.': rawName='.$rawName.' hasSlash='.(strpos($rawName, '/') !== false ? 'yes' : 'no'), $u);
+        }
+
+        // Normalize & secure path - preserve folder structure
+        // Firefox with webkitdirectory should send paths like "folder/subfolder/file.txt"
+        // But Firefox might send just filenames or paths differently
+        $relPath = $this->normalizePath($rawName);
+        if($relPath === false) {
+          log_action('UPLOAD_SKIP', 'Invalid path: '.$rawName, $u, 'warning');
+          continue;
+        }
+
+        // Log normalized path for debugging
+        if(LOG_ENABLED) {
+          log_action('UPLOAD_DEBUG', 'File '.$i.': normalized='.$relPath.' (original='.$rawName.')', $u);
+        }
+
+        $target = $this->path.'/'.$relPath;
+
+        // EMPTY FOLDER SUPPORT
+        // Check if this is an empty folder marker
+        if(substr($rawName, -1) === '/' || ($fileSize === 0 && !is_uploaded_file($tmp))){
+          if(!is_dir($target)){
+            if(@mkdir($target, 0755, true)){
+              log_action('UPLOAD', 'Folder: '.$relPath, $u);
+            } else {
+              log_action('UPLOAD_ERROR', 'Failed to create folder: '.$relPath, $u, 'error');
+            }
+          }
+          continue;
+        }
+
+        // Ensure parent directory exists before moving file
+        // This preserves folder structure from webkitdirectory uploads
+        $dir = dirname($target);
+        if($dir !== $this->path && !is_dir($dir)){
+          if(LOG_ENABLED) {
+            log_action('UPLOAD_DEBUG', 'Creating directory: '.$dir.' (relPath='.$relPath.')', $u);
+          }
+          if(!@mkdir($dir, 0755, true)){
+            $error = error_get_last();
+            log_action('UPLOAD_ERROR', 'Failed to create directory: '.dirname($relPath).' Error: '.($error ? $error['message'] : 'unknown'), $u, 'error');
+            continue;
+          } else {
+            if(LOG_ENABLED) {
+              log_action('UPLOAD_DEBUG', 'Successfully created directory: '.$dir, $u);
+            }
           }
         }
+
+        // Final security check - ensure target is within storage root
+        if(!$this->ensureInsideRoot($target)) {
+          log_action('UPLOAD_SKIP', 'Path outside root: '.$relPath, $u, 'warning');
+          continue;
+        }
+
+        // Move uploaded file to target location
+        if(move_uploaded_file($tmp, $target)){
+          @chmod($target, 0644);
+          log_action('UPLOAD', 'File: '.$relPath, $u);
+        } else {
+          log_action('UPLOAD_ERROR', 'Failed to move file: '.$relPath, $u, 'error');
+        }
       }
+
     } elseif(isset($_POST['md']) && ($d=trim($_POST['md'])) && !$this->isDenied($d)){
       @mkdir($this->path.'/'.$d, 0755, true);
       log_action('CREATE_DIR', 'Dir: '.$d, $u);
@@ -435,7 +538,7 @@ class Dav {
     if(!file_exists($this->path)){http_response_code(404);exit;}
     if(is_dir($this->path)){$this->HTML();exit;}
     if($this->isDenied(basename($this->path))){http_response_code(403);exit;}
-    $dl=isset($_GET['dl']);$m=$this->mime($this->path);
+    $dl=isset($_GET['download']);$m=$this->mime($this->path);
     header('Content-Type: '.($dl?'application/octet-stream':$m));header('Content-Length: '.filesize($this->path));header('ETag: "'.hash_file('md5',$this->path).'"');
     header('Content-Disposition: '.($dl?'attachment':'inline').'; filename="'.basename($this->path).'"');
     log_action('FILE_ACCESS', 'File: '.basename($this->path), $_SERVER['PHP_AUTH_USER']??'unknown');
@@ -550,7 +653,7 @@ class Dav {
   $ICONS=[
     'file'=>'<svg class="i" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg>',
     'directory'=>'<svg class="i" viewBox="0 0 24 24" style="color:#facc15"><path fill="currentColor" d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>',
-    'dl'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>',
+    'download'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>',
     'share'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>',
     'ed'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>',
     'copy'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>',
@@ -679,14 +782,14 @@ class Dav {
           <?php if($this->req!=='/'): $pp=array_filter(explode('/',$this->req)); array_pop($pp); ?>
           <a href="<?=$this->uri.'/'.implode('/',array_map('rawurlencode',$pp))?>" class="btn"><?=T('back')?></a>
           <?php endif;?>
-          <form method="post" enctype="multipart/form-data" style="margin:0;display:flex">
+          <form method="post" enctype="multipart/form-data" id="uploadForm" style="margin:0;display:flex">
             <input type="hidden" name="t" value="<?=$csrf?>"><input type="hidden" name="cur_dir" value="<?=$this->req?>">
             <div class="btn-group">
                 <label class="btn bp" title="<?=T('up')?>"><?=T('up')?>
                   <input type="file" name="f[]" hidden multiple onchange="this.form.submit()">
                 </label>
                 <label class="btn bp" title="<?=T('up_folder')?>"><?=T('up_folder')?>
-                  <input type="file" name="f[]" hidden multiple webkitdirectory mozdirectory onchange="this.form.submit()">
+                  <input type="file" id="folderInput" name="f[]" hidden multiple webkitdirectory mozdirectory onchange="handleFolderUpload(this)">
                 </label>
             </div>
           </form>
@@ -742,7 +845,7 @@ class Dav {
                 <td>
                   <div class="acts">
                     <?php if(!$d): ?>
-                      <a href="<?=$lk?>?dl=1" class="ab" title="<?=T('dl')?>"><?=$ICONS['dl']?></a>
+                      <a href="<?=$lk?>?dl=1" class="ab" title="<?=T('download')?>"><?=$ICONS['download']?></a>
                       <button onclick="shareFile('<?=addslashes($f)?>','<?=$sTok?>',<?=$shr?$shr['expires']:0?>,<?=$shr?$shr['max_uses']:0?>,<?=$shr?$shr['uses']:0?>,<?=$shr?$shr['start_ts']:0?>)" class="ab" title="<?=T('share')?>"><?=$ICONS['share']?></button>
                     <?php endif; ?>
                     <button onclick="p('rename','<?=$f?>')" class="ab" title="<?=T('rename')?>"><?=$ICONS['ed']?></button>
@@ -895,21 +998,225 @@ class Dav {
           document.execCommand('copy'); showToast('<?=T('sh_ok')?>');
         }
 
+        // Handle folder uploads - preserve folder structure for Firefox
+        function handleFolderUpload(input) {
+          const files = input.files;
+          if (!files || files.length === 0) return;
+
+          // Check if files have webkitRelativePath (Firefox/Chrome with webkitdirectory)
+          let hasRelativePaths = false;
+          for (let i = 0; i < files.length; i++) {
+            if (files[i].webkitRelativePath) {
+              hasRelativePaths = true;
+              break;
+            }
+          }
+
+          // If we have relative paths, submit via FormData to preserve them
+          if (hasRelativePaths) {
+            const form = input.closest('form');
+            const dt = new FormData();
+            dt.append('t', csrf);
+            dt.append('cur_dir', cur);
+
+            for (let i = 0; i < files.length; i++) {
+              const f = files[i];
+              const relPath = f.webkitRelativePath || f.name;
+              dt.append('f[]', f);
+              dt.append('f_path[]', relPath);
+            }
+
+            showToast('Uploading...');
+            fetch(window.location.href, {method:'POST', body:dt}).then(r=>{
+              if(r.ok) window.location.reload();
+            });
+          } else {
+            // Fallback: submit form normally (may lose folder structure in Firefox)
+            input.closest('form').submit();
+          }
+        }
+
         window.onclick=e=>{if(e.target.className==='mod') cl();};
         const quick='<?=$quickS?>';
         if(quick){ $('q_lnk').value=genLink(quick); copyLink('q_lnk'); history.replaceState(null,'',location.pathname+location.search.replace(/[?&]quick=[^&]+/, '').replace(/^&/, '?')); }
 
-        // Drag & Drop
+        // Drag & Drop (preserve folder structure when possible)
         window.addEventListener('dragover', e => {e.preventDefault(); document.body.classList.add('drop-active');});
         window.addEventListener('dragleave', e => {if(e.relatedTarget === null || e.target === document.querySelector('.drop-overlay')) document.body.classList.remove('drop-active');});
         window.addEventListener('drop', e => {
-          e.preventDefault(); document.body.classList.remove('drop-active');
-          if(e.dataTransfer.files.length > 0) {
+          e.preventDefault();
+          document.body.classList.remove('drop-active');
+
+          const handleFilesAndUpload = (fileEntries) => {
+            if (!fileEntries || !fileEntries.length) return;
             const dt = new FormData();
-            dt.append('t', csrf); dt.append('cur_dir', cur);
-            for(let i=0; i<e.dataTransfer.files.length; i++) dt.append('f[]', e.dataTransfer.files[i]);
+            dt.append('t', csrf);
+            dt.append('cur_dir', cur);
+
+            // Use separate path array for Firefox compatibility
+            fileEntries.forEach(({file, path}, idx) => {
+              const name = (path || file.name || '').replace(/^\/+/, '');
+              if (!name) return;
+              dt.append('f[]', file);
+              // Send path separately for Firefox compatibility
+              dt.append('f_path[]', name);
+            });
+
             showToast('Uploading...');
             fetch(window.location.href, {method:'POST', body:dt}).then(r=>{if(r.ok) window.location.reload();});
+          };
+
+          const items = e.dataTransfer.items;
+          const files = e.dataTransfer.files;
+
+          // Chrome/Edge/Safari: walk directory entries to keep folder hierarchy
+          if (items && items.length > 0) {
+            // Check if webkitGetAsEntry is available (Safari/Chrome)
+            let hasWebkitEntry = false;
+            try {
+              hasWebkitEntry = items[0] && typeof items[0].webkitGetAsEntry === 'function';
+            } catch (e) {
+              // Some browsers may throw when checking
+            }
+
+            if (hasWebkitEntry) {
+              const rootEntries = [];
+              for (let i = 0; i < items.length; i++) {
+                const it = items[i];
+                // Handle both files and directories (Safari may have kind='directory' for folders)
+                if ((it.kind === 'file' || it.kind === 'directory') && typeof it.webkitGetAsEntry === 'function') {
+                  try {
+                    const entry = it.webkitGetAsEntry();
+                    if (entry) rootEntries.push(entry);
+                  } catch (err) {
+                    // Fallback if webkitGetAsEntry fails
+                    console.warn('webkitGetAsEntry failed:', err);
+                  }
+                }
+              }
+
+              if (rootEntries.length > 0) {
+                const fileEntries = [];
+                let pending = 0;
+                let hasStarted = false;
+                let timeoutId = null;
+
+                const readEntry = (entry, basePath) => {
+                  if (!entry) return;
+
+                  const currentPath = basePath ? (basePath + '/' + entry.name) : entry.name;
+
+                  if (entry.isFile) {
+                    pending++;
+                    hasStarted = true;
+                    try {
+                      entry.file(file => {
+                        fileEntries.push({file, path: currentPath});
+                        pending--;
+                        if (pending === 0 && hasStarted) {
+                          if (timeoutId) clearTimeout(timeoutId);
+                          handleFilesAndUpload(fileEntries);
+                        }
+                      }, err => {
+                        console.warn('Error reading file:', err);
+                        pending--;
+                        if (pending === 0 && hasStarted) {
+                          if (timeoutId) clearTimeout(timeoutId);
+                          handleFilesAndUpload(fileEntries);
+                        }
+                      });
+                    } catch (err) {
+                      console.warn('Error calling entry.file:', err);
+                      pending--;
+                      if (pending === 0 && hasStarted) {
+                        if (timeoutId) clearTimeout(timeoutId);
+                        handleFilesAndUpload(fileEntries);
+                      }
+                    }
+                  } else if (entry.isDirectory) {
+                    try {
+                      const reader = entry.createReader();
+                      pending++;
+                      hasStarted = true;
+                      const readBatch = () => {
+                        try {
+                          reader.readEntries(results => {
+                            if (!results || results.length === 0) {
+                              pending--;
+                              if (pending === 0 && hasStarted) {
+                                if (timeoutId) clearTimeout(timeoutId);
+                                handleFilesAndUpload(fileEntries);
+                              }
+                              return;
+                            }
+                            results.forEach(child => {
+                              if (child) readEntry(child, currentPath);
+                            });
+                            // Continue reading if there are more entries
+                            readBatch();
+                          }, err => {
+                            console.warn('Error reading directory:', err);
+                            pending--;
+                            if (pending === 0 && hasStarted) {
+                              if (timeoutId) clearTimeout(timeoutId);
+                              handleFilesAndUpload(fileEntries);
+                            }
+                          });
+                        } catch (err) {
+                          console.warn('Error calling readEntries:', err);
+                          pending--;
+                          if (pending === 0 && hasStarted) {
+                            if (timeoutId) clearTimeout(timeoutId);
+                            handleFilesAndUpload(fileEntries);
+                          }
+                        }
+                      };
+                      readBatch();
+                    } catch (err) {
+                      console.warn('Error creating directory reader:', err);
+                      pending--;
+                      if (pending === 0 && hasStarted) {
+                        if (timeoutId) clearTimeout(timeoutId);
+                        handleFilesAndUpload(fileEntries);
+                      }
+                    }
+                  }
+                };
+
+                rootEntries.forEach(entry => readEntry(entry, ''));
+
+                // Safety timeout: if nothing happens after 2 seconds, fall back
+                timeoutId = setTimeout(() => {
+                  if (!hasStarted || fileEntries.length === 0) {
+                    // Fallback to flat file list
+                    const flatFiles = [];
+                    if (files && files.length > 0) {
+                      for (let i = 0; i < files.length; i++) {
+                        const f = files[i];
+                        flatFiles.push({file: f, path: f.name});
+                      }
+                    }
+                    if (flatFiles.length > 0) {
+                      handleFilesAndUpload(flatFiles);
+                    }
+                  }
+                }, 2000);
+
+                return; // handled asynchronously; don't run the flat fallback
+              }
+            }
+          }
+
+          // Fallback: Handle files directly (for Firefox and Safari fallback)
+          if (files && files.length > 0) {
+            const fileEntries = [];
+            for (let i = 0; i < files.length; i++) {
+              const f = files[i];
+              // Check for webkitRelativePath (set when dragging from directory picker)
+              const relPath = f.webkitRelativePath || f.name;
+              fileEntries.push({file: f, path: relPath});
+            }
+            handleFilesAndUpload(fileEntries);
           }
         });
       </script>
