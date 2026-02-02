@@ -211,7 +211,7 @@ log_action('LOGIN', 'User: '.$u, $u);
 
 // --- UI & Translation ---
 $lang = $_COOKIE['l'] ?? 'de';
-$L=['cn'=> ['home'=>'首页','back'=>'返回上级','up'=>'上传文件','up_folder'=>'文件夹','new'=>'新建文件夹','cr'=>'创建','nm'=>'名称','sz'=>'大小','tm'=>'修改时间','ac'=>'操作','dl'=>'下载','rn'=>'重命名','cp'=>'复制','mv'=>'移动','rm'=>'删除','sh'=>'分享','emp'=>'空目录','tip'=>'确认执行操作','lnk'=>'直链地址','cpl'=>'复制链接','ok'=>'确定','cc'=>'取消','tar'=>'目标路径','sh_m'=>'分享管理','sh_new'=>'新建分享','sh_up'=>'更新设置','sh_rnd'=>'随机生成','sh_cus'=>'自定义','sh_del'=>'取消分享','sh_ok'=>'链接已复制','exp'=>'有效期','uses'=>'使用情况','unlimited'=>'无限制','days'=>'天','hours'=>'小时','mins'=>'分钟','max_uses'=>'最大次数','set'=>'设置','link_copied'=>'链接已复制','exp_never'=>'永不过期','exp_1d'=>'1天','exp_7d'=>'7天','exp_30d'=>'30天','uses_1'=>'1次','uses_5'=>'5次','uses_10'=>'10次','uses_50'=>'50次','custom'=>'自定义','sharing'=>'分享设置','save'=>'保存','modify'=>'修改配置','log_title'=>'操作日志','log_download'=>'下载日志','log_clear'=>'清空日志','st_exp'=>'已过期','st_ok'=>'分享中','st_wait'=>'未开始','stat'=>'统计信息','exp_at'=>'到期时间','start_at'=>'生效时间','used'=>'已用','delay'=>'生效延时','delay_none'=>'立即生效','delay_10m'=>'10分钟后','delay_1h'=>'1小时后','path_ph'=>'输入路径按回车跳转...','pwd'=>'访问密码','pwd_ph'=>'留空则无密码','sel_all'=>'全选','batch'=>'批量操作','del_sel'=>'删除选中','drag_tip'=>'释放以上传文件'],'en'=>['home'=>'Home','back'=>'Back','up'=>'Upload File','up_folder'=>'Folder','new'=>'New Folder','cr'=>'Create','nm'=>'Name','sz'=>'Size','tm'=>'Modified','ac'=>'Actions','dl'=>'Download','rn'=>'Rename','cp'=>'Copy','mv'=>'Move','rm'=>'Delete','sh'=>'Share','emp'=>'Empty','tip'=>'Confirm Action','lnk'=>'Link','cpl'=>'Copy Link','ok'=>'OK','cc'=>'Cancel','tar'=>'Target Path','sh_m'=>'Share Manager','sh_new'=>'New Share','sh_up'=>'Update Settings','sh_rnd'=>'Random','sh_cus'=>'Custom','sh_del'=>'Unshare','sh_ok'=>'Link Copied','exp'=>'Expires In','uses'=>'Usage','unlimited'=>'Unlimited','days'=>'days','hours'=>'hours','mins'=>'minutes','max_uses'=>'Max Uses','set'=>'Settings','link_copied'=>'Link copied','exp_never'=>'Never','exp_1d'=>'1 day','exp_7d'=>'7 days','exp_30d'=>'30 days','uses_1'=>'1 use','uses_5'=>'5 uses','uses_10'=>'10 uses','uses_50'=>'50 uses','custom'=>'Custom','sharing'=>'Sharing Settings','save'=>'Save','modify'=>'Modify Share','log_title'=>'Operation Logs','log_download'=>'Download Log','log_clear'=>'Clear Log','st_exp'=>'EXPIRED','st_ok'=>'SHARED','st_wait'=>'WAITING','stat'=>'Statistics','exp_at'=>'Expires At','start_at'=>'Starts At','used'=>'Used','delay'=>'Start Delay','delay_none'=>'Immediate','delay_10m'=>'In 10 mins','delay_1h'=>'In 1 hour','path_ph'=>'Type path and hit Enter...','pwd'=>'Password','pwd_ph'=>'Empty = No Password','sel_all'=>'Select All','batch'=>'Batch','del_sel'=>'Delete Selected','drag_tip'=>'Drop to Upload'],'de'=>['home'=>'Start','back'=>'Zurück','up'=>'Datei hochladen','up_folder'=>'Verzeichnis hochladen','new'=>'Neues Verzeichnis','cr'=>'Erstellen','nm'=>'Name','sz'=>'Größe','tm'=>'Verändert','ac'=>'Aktionen','dl'=>'Download','rn'=>'Umbenennen','cp'=>'Kopieren','mv'=>'Verschieben','rm'=>'Löschen','sh'=>'Teilen','emp'=>'Leer','tip'=>'Aktion bestätigen','lnk'=>'Link','cpl'=>'Link kopieren','ok'=>'OK','cc'=>'Abbrechen','tar'=>'Zielpfad','sh_m'=>'Freigaben-Manager','sh_new'=>'Neue Freigabe','sh_up'=>'Einstellungen aktualisieren','sh_rnd'=>'Zufällig','sh_cus'=>'Benutzerdefiniert','sh_del'=>'Freigabe löschen','sh_ok'=>'Link kopiert','exp'=>'Läuft ab in','uses'=>'Verwendung','unlimited'=>'Unbegrenzt','days'=>'Tage','hours'=>'Stunden','mins'=>'Minuten','max_uses'=>'Maximale Nutzung','set'=>'Einstellungen','link_copied'=>'Link kopiert','exp_never'=>'Nie','exp_1d'=>'1 Tag','exp_7d'=>'7 Tage','exp_30d'=>'30 Tage','uses_1'=>'1 use','uses_5'=>'5 uses','uses_10'=>'10 uses','uses_50'=>'50 uses','custom'=>'Benutzerdefiniert','sharing'=>'Freigaben Einstellungen','save'=>'Speichern','modify'=>'Freigabe verändern','log_title'=>'Nutzungsprotokoll','log_download'=>'Download Protokoll','log_clear'=>'Protokoll zurücksetzen','st_exp'=>'ABGELAUFEN','st_ok'=>'GETEILT','st_wait'=>'WARTEN','stat'=>'Statistik','exp_at'=>'Ablaufdatum','start_at'=>'Beginnt bei','used'=>'Verwendet','delay'=>'Startverzögerung','delay_none'=>'Sofort','delay_10m'=>'In 10 Minute','delay_1h'=>'In 1 Stunde','path_ph'=>'Pfad eingeben und mit Enter bestätigen...','pwd'=>'Passwort','pwd_ph'=>'Empty = Kein Passwort','sel_all'=>'Alle auswählen','batch'=>'Stapelverarbeitung','del_sel'=>'Ausgewählte löschen','drag_tip'=>'Ablegen zum Hochladen']];
+$L=['cn'=> ['home'=>'首页','back'=>'返回上级','up'=>'上传文件','up_folder'=>'文件夹','new'=>'新建文件夹','cr'=>'创建','nm'=>'名称','sz'=>'大小','tm'=>'修改时间','ac'=>'操作','dl'=>'下载','rename'=>'重命名','copy'=>'复制','move'=>'移动','delete'=>'删除','share'=>'分享','emp'=>'空目录','tip'=>'确认执行操作','lnk'=>'直链地址','cpl'=>'复制链接','ok'=>'确定','cc'=>'取消','tar'=>'目标路径','sh_m'=>'分享管理','sh_new'=>'新建分享','sh_up'=>'更新设置','sh_rnd'=>'随机生成','sh_cus'=>'自定义','sh_del'=>'取消分享','sh_ok'=>'链接已复制','exp'=>'有效期','uses'=>'使用情况','unlimited'=>'无限制','days'=>'天','hours'=>'小时','mins'=>'分钟','max_uses'=>'最大次数','set'=>'设置','link_copied'=>'链接已复制','exp_never'=>'永不过期','exp_1d'=>'1天','exp_7d'=>'7天','exp_30d'=>'30天','uses_1'=>'1次','uses_5'=>'5次','uses_10'=>'10次','uses_50'=>'50次','custom'=>'自定义','sharing'=>'分享设置','save'=>'保存','modify'=>'修改配置','log_title'=>'操作日志','log_download'=>'下载日志','log_clear'=>'清空日志','st_exp'=>'已过期','st_ok'=>'分享中','st_wait'=>'未开始','stat'=>'统计信息','exp_at'=>'到期时间','start_at'=>'生效时间','used'=>'已用','delay'=>'生效延时','delay_none'=>'立即生效','delay_10m'=>'10分钟后','delay_1h'=>'1小时后','path_ph'=>'输入路径按回车跳转...','pwd'=>'访问密码','pwd_ph'=>'留空则无密码','sel_all'=>'全选','batch'=>'批量操作','del_sel'=>'删除选中','drag_tip'=>'释放以上传文件'],'en'=>['home'=>'Home','back'=>'Back','up'=>'Upload File','up_folder'=>'Folder','new'=>'New Folder','cr'=>'Create','nm'=>'Name','sz'=>'Size','tm'=>'Modified','ac'=>'Actions','dl'=>'Download','rename'=>'Rename','copy'=>'Copy','move'=>'Move','delete'=>'Delete','share'=>'Share','emp'=>'Empty','tip'=>'Confirm Action','lnk'=>'Link','cpl'=>'Copy Link','ok'=>'OK','cc'=>'Cancel','tar'=>'Target Path','sh_m'=>'Share Manager','sh_new'=>'New Share','sh_up'=>'Update Settings','sh_rnd'=>'Random','sh_cus'=>'Custom','sh_del'=>'Unshare','sh_ok'=>'Link Copied','exp'=>'Expires In','uses'=>'Usage','unlimited'=>'Unlimited','days'=>'days','hours'=>'hours','mins'=>'minutes','max_uses'=>'Max Uses','set'=>'Settings','link_copied'=>'Link copied','exp_never'=>'Never','exp_1d'=>'1 day','exp_7d'=>'7 days','exp_30d'=>'30 days','uses_1'=>'1 use','uses_5'=>'5 uses','uses_10'=>'10 uses','uses_50'=>'50 uses','custom'=>'Custom','sharing'=>'Sharing Settings','save'=>'Save','modify'=>'Modify Share','log_title'=>'Operation Logs','log_download'=>'Download Log','log_clear'=>'Clear Log','st_exp'=>'EXPIRED','st_ok'=>'SHARED','st_wait'=>'WAITING','stat'=>'Statistics','exp_at'=>'Expires At','start_at'=>'Starts At','used'=>'Used','delay'=>'Start Delay','delay_none'=>'Immediate','delay_10m'=>'In 10 mins','delay_1h'=>'In 1 hour','path_ph'=>'Type path and hit Enter...','pwd'=>'Password','pwd_ph'=>'Empty = No Password','sel_all'=>'Select All','batch'=>'Batch','del_sel'=>'Delete Selected','drag_tip'=>'Drop to Upload'],'de'=>['home'=>'Start','back'=>'Zurück','up'=>'Datei hochladen','up_folder'=>'Verzeichnis hochladen','new'=>'Neues Verzeichnis','cr'=>'Erstellen','nm'=>'Name','sz'=>'Größe','tm'=>'Verändert','ac'=>'Aktionen','dl'=>'Download','rename'=>'Umbenennen','copy'=>'Kopieren','move'=>'Verschieben','delete'=>'Löschen','share'=>'Teilen','emp'=>'Leer','tip'=>'Aktion bestätigen','lnk'=>'Link','cpl'=>'Link kopieren','ok'=>'OK','cc'=>'Abbrechen','tar'=>'Zielpfad','sh_m'=>'Freigaben-Manager','sh_new'=>'Neue Freigabe','sh_up'=>'Einstellungen aktualisieren','sh_rnd'=>'Zufällig','sh_cus'=>'Benutzerdefiniert','sh_del'=>'Freigabe löschen','sh_ok'=>'Link kopiert','exp'=>'Läuft ab in','uses'=>'Verwendung','unlimited'=>'Unbegrenzt','days'=>'Tage','hours'=>'Stunden','mins'=>'Minuten','max_uses'=>'Maximale Nutzung','set'=>'Einstellungen','link_copied'=>'Link kopiert','exp_never'=>'Nie','exp_1d'=>'1 Tag','exp_7d'=>'7 Tage','exp_30d'=>'30 Tage','uses_1'=>'1 use','uses_5'=>'5 uses','uses_10'=>'10 uses','uses_50'=>'50 uses','custom'=>'Benutzerdefiniert','sharing'=>'Freigaben Einstellungen','save'=>'Speichern','modify'=>'Freigabe verändern','log_title'=>'Nutzungsprotokoll','log_download'=>'Download Protokoll','log_clear'=>'Protokoll zurücksetzen','st_exp'=>'ABGELAUFEN','st_ok'=>'GETEILT','st_wait'=>'WARTEN','stat'=>'Statistik','exp_at'=>'Ablaufdatum','start_at'=>'Beginnt bei','used'=>'Verwendet','delay'=>'Startverzögerung','delay_none'=>'Sofort','delay_10m'=>'In 10 Minute','delay_1h'=>'In 1 Stunde','path_ph'=>'Pfad eingeben und mit Enter bestätigen...','pwd'=>'Passwort','pwd_ph'=>'Empty = Kein Passwort','sel_all'=>'Alle auswählen','batch'=>'Stapelverarbeitung','del_sel'=>'Ausgewählte löschen','drag_tip'=>'Ablegen zum Hochladen']];
 
 if(isset($_GET['l'])){setcookie('l',$_GET['l'],time()+31536000);header("Location: ".BASE.'/'.S_NAME);exit;}
 function T($k){global $L,$lang;return $L[$lang][$k]??$k;}
@@ -347,18 +347,18 @@ class Dav {
         $t = $this->path.'/'.$n;
         if(!file_exists($t)) continue;
 
-        if($act === 'rn' && ($nn=trim($_POST['nn']??'')) && !$this->isDenied($nn) && !file_exists(dirname($t).'/'.$nn)){
+        if($act === 'rename' && ($nn=trim($_POST['nn']??'')) && !$this->isDenied($nn) && !file_exists(dirname($t).'/'.$nn)){
           $this->cleanShare($t);
           rename($t, dirname($t).'/'.$nn);
           log_action('RENAME', $n.'->'.$nn, $u);
-        } elseif($act === 'rm'){
+        } elseif($act === 'delete'){
           $this->cleanShare($t);
           $this->safeDel($t);
           log_action('DELETE', $n, $u);
-        } elseif(($act === 'cp' || $act === 'mv') && ($tg = $_POST['tg']??'')){
+        } elseif(($act === 'copy' || $act === 'move') && ($tg = $_POST['tg']??'')){
           $dst = $this->cleanPath('/'.ltrim($tg, '/')).'/'.$n;
           if(!$this->isDenied(basename($dst))){
-            if($act === 'mv'){
+            if($act === 'move'){
               $this->cleanShare($t);
               if(!is_dir(dirname($dst))) @mkdir(dirname($dst), 0755, true);
               rename($t, $dst);
@@ -551,7 +551,7 @@ class Dav {
     'file'=>'<svg class="i" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg>',
     'directory'=>'<svg class="i" viewBox="0 0 24 24" style="color:#facc15"><path fill="currentColor" d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>',
     'dl'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>',
-    'sh'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>',
+    'share'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>',
     'ed'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>',
     'copy'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>',
     'move'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/></svg>',
@@ -697,9 +697,9 @@ class Dav {
           </form>
           <div id="batch_acts" class="batch-bar">
             <span><?=T('batch')?>:</span>
-            <button onclick="p('cp', null)" class="ab" title="<?=T('cp')?>"><?=$ICONS['copy']?></button>
-            <button onclick="p('mv', null)" class="ab" title="<?=T('mv')?>"><?=$ICONS['move']?></button>
-            <button onclick="p('rm', null)" class="ab del" title="<?=T('rm')?>"><?=$ICONS['delete']?></button>
+            <button onclick="p('copy', null)" class="ab" title="<?=T('copy')?>"><?=$ICONS['copy']?></button>
+            <button onclick="p('move', null)" class="ab" title="<?=T('move')?>"><?=$ICONS['move']?></button>
+            <button onclick="p('delete', null)" class="ab del" title="<?=T('delete')?>"><?=$ICONS['delete']?></button>
           </div>
         </div>
         <div class="main">
@@ -743,12 +743,12 @@ class Dav {
                   <div class="acts">
                     <?php if(!$d): ?>
                       <a href="<?=$lk?>?dl=1" class="ab" title="<?=T('dl')?>"><?=$ICONS['dl']?></a>
-                      <button onclick="shareFile('<?=addslashes($f)?>','<?=$sTok?>',<?=$shr?$shr['expires']:0?>,<?=$shr?$shr['max_uses']:0?>,<?=$shr?$shr['uses']:0?>,<?=$shr?$shr['start_ts']:0?>)" class="ab" title="<?=T('sh')?>"><?=$ICONS['sh']?></button>
+                      <button onclick="shareFile('<?=addslashes($f)?>','<?=$sTok?>',<?=$shr?$shr['expires']:0?>,<?=$shr?$shr['max_uses']:0?>,<?=$shr?$shr['uses']:0?>,<?=$shr?$shr['start_ts']:0?>)" class="ab" title="<?=T('share')?>"><?=$ICONS['share']?></button>
                     <?php endif; ?>
-                    <button onclick="p('rn','<?=$f?>')" class="ab" title="<?=T('rn')?>"><?=$ICONS['ed']?></button>
-                    <button onclick="p('cp','<?=$f?>')" class="ab" title="<?=T('cp')?>"><?=$ICONS['cp']?></button>
-                    <button onclick="p('mv','<?=$f?>')" class="ab" title="<?=T('mv')?>"><?=$ICONS['mv']?></button>
-                    <button onclick="p('rm','<?=$f?>')" class="ab del" title="<?=T('rm')?>"><?=$ICONS['rm']?></button>
+                    <button onclick="p('rename','<?=$f?>')" class="ab" title="<?=T('rename')?>"><?=$ICONS['ed']?></button>
+                    <button onclick="p('copy','<?=$f?>')" class="ab" title="<?=T('copy')?>"><?=$ICONS['copy']?></button>
+                    <button onclick="p('move','<?=$f?>')" class="ab" title="<?=T('move')?>"><?=$ICONS['move']?></button>
+                    <button onclick="p('delete','<?=$f?>')" class="ab del" title="<?=T('delete')?>"><?=$ICONS['delete']?></button>
                   </div>
                 </td>
               </tr>
@@ -816,22 +816,22 @@ class Dav {
           let items = n ? [n] : getSel();
           if(items.length===0) return;
           $('md').style.display='flex';$('mb_cnt').className='mb sm';
-          let tTxt = (a=='rn'?'<?=T('rn')?>':(a=='cp'?'<?=T('cp')?>':(a=='mv'?'<?=T('mv')?>':'<?=T('rm')?>')));
+          let tTxt = (a=='rename'?'<?=T('rename')?>':(a=='copy'?'<?=T('copy')?>':(a=='move'?'<?=T('move')?>':'<?=T('delete')?>')));
           if(items.length > 1) tTxt += ' ('+items.length+')';
           $('mt').innerText=tTxt;
           let h='';
-          if(a=='rm') h='<p><?=T('tip')?> '+(items.length>1?'<?=T('del_sel')?> ('+items.length+')':'"'+items[0]+'"')+'?</p>';
+          if(a=='delete') h='<p><?=T('tip')?> '+(items.length>1?'<?=T('del_sel')?> ('+items.length+')':'"'+items[0]+'"')+'?</p>';
           else {
-            if(a=='rn' && items.length > 1) { alert('Rename one at a time'); cl(); return; }
-            h='<input id="iv" value="'+(a=='rn'?items[0]:cur)+'" style="width:100%;padding:12px 16px;border:2px solid var(--bd);border-radius:6px;background:transparent;color:var(--tx);box-sizing:border-box;transition:all 0.2s" placeholder="'+(a=='rn'?'<?=T('nm')?>':'<?=T('tar')?>')+'">';
+            if(a=='rename' && items.length > 1) { alert('Rename one at a time'); cl(); return; }
+            h='<input id="iv" value="'+(a=='rename'?items[0]:cur)+'" style="width:100%;padding:12px 16px;border:2px solid var(--bd);border-radius:6px;background:transparent;color:var(--tx);box-sizing:border-box;transition:all 0.2s" placeholder="'+(a=='rename'?'<?=T('nm')?>':'<?=T('tar')?>')+'">';
           }
           $('mc').innerHTML=h;if($('iv')) setTimeout(()=>$('iv').focus(),50);
-          $('mok').className='btn '+(a=='rm'?'bd':'bp');$('mok').innerText=a=='rm'?'<?=T('rm')?>':'<?=T('ok')?>';$('mok').style.display='inline-flex';
+          $('mok').className='btn '+(a=='delete'?'bd':'bp');$('mok').innerText=a=='delete'?'<?=T('delete')?>':'<?=T('ok')?>';$('mok').style.display='inline-flex';
           $('mok').onclick=()=>{
             let val=$('iv')?$('iv').value:'';
             let inputs = '<input type="hidden" name="t" value="'+csrf+'"><input name="act" value="'+a+'">';
             items.forEach(i => { inputs += '<input name="n[]" value="'+i.replace(/"/g,'&quot;')+'">'; });
-            if(val) inputs += '<input name="'+(a=='rn'?'nn':'tg')+'" value="'+val.replace(/"/g,'&quot;')+'">';
+            if(val) inputs += '<input name="'+(a=='rename'?'nn':'tg')+'" value="'+val.replace(/"/g,'&quot;')+'">';
             pf(inputs);
           }
         }
