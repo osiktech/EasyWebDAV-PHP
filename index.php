@@ -666,6 +666,7 @@ class Dav {
 
   public function handleBrowser() {
     $this->chk(); global $u, $isAdmin;
+    log_action('DEBUG', 'isAdmin: '. $isAdmin);
     if(isset($_FILES['f'])) {
       $file_ary = $_FILES['f'];
       $file_count = is_array($file_ary['name']) ? count($file_ary['name']) : 1;
@@ -1041,13 +1042,13 @@ class Dav {
   }
 
   private function size($b) {
-    $u = ['B','KB','MB','GB'];
+    $unit = ['B','KB','MB','GB'];
     $i =0;
     while($b>=1024&&$i<3) {
       $b /= 1024;
       $i++;
     }
-    return round($b, 2) . ' ' . $u[$i];
+    return round($b, 2) . ' ' . $unit[$i];
   }
 
   private function HTML() {
@@ -1082,7 +1083,7 @@ class Dav {
      return 1;
     };
 
-    $I = [
+    $ICONS = [
       'f' => '<svg class="i" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg>',
       'd' => '<svg class="i" viewBox="0 0 24 24" style="color:#facc15"><path fill="currentColor" d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>',
       'download' => '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>',
@@ -1093,7 +1094,8 @@ class Dav {
       'rm' => '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
       'log' => '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>',
       'bat' => '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>',
-      'up_f' => '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10zm-7.01-5l-1.41-1.41 2.01-2.01h-2.83v-2h2.83l-2.01-2.01 1.41-1.41 4.42 4.42-4.42 4.42z"/></svg>'
+      'up_f' => '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10zm-7.01-5l-1.41-1.41 2.01-2.01h-2.83v-2h2.83l-2.01-2.01 1.41-1.41 4.42 4.42-4.42 4.42z"/></svg>',
+      'user' => '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>'
     ];
 
 ?>
@@ -1199,7 +1201,7 @@ class Dav {
           <input class="nav-input" id="pathBar" value="<?= $this->req === '/' ? '' : ltrim($this->req,'/') ?>" placeholder="<?= T('path_ph') ?>" onkeydown="if(event.key==='Enter') goToPath(this.value)">
         </div>
         <div style="display:flex;gap:14px;align-items:center">
-          <?php if(LOG_ENABLED): ?><a href="#" onclick="showLogs()" class="ab" title="<?= T('log_title') ?>" style="padding:8px"><?= $I['log'] ?></a><?php endif; ?>
+          <?php if(LOG_ENABLED): ?><a href="#" onclick="showLogs()" class="ab" title="<?= T('log_title') ?>" style="padding:8px"><?= $ICONS['log'] ?></a><?php endif; ?>
           <?php if($isAdmin): ?><a href="#" onclick="showUsers()" class="ab" title="<?=T('user_m')?>" style="padding:8px"><?=$ICONS['user']?></a><?php endif; ?>
           <button class="tg" onclick="mode()">
             <svg class="float-icon" width="24" height="24" viewBox="0 0 24 24" fill="#FDB813">
@@ -1238,9 +1240,9 @@ class Dav {
         </form>
         <div id="batch_acts" class="batch-bar">
           <span><?= T('batch') ?>:</span>
-          <button onclick="p('cp', null)" class="ab" title="<?= T('cp') ?>"><?= $I['cp'] ?></button>
-          <button onclick="p('mv', null)" class="ab" title="<?= T('mv') ?>"><?= $I['mv'] ?></button>
-          <button onclick="p('rm', null)" class="ab del" title="<?= T('rm') ?>"><?= $I['rm'] ?></button>
+          <button onclick="p('cp', null)" class="ab" title="<?= T('cp') ?>"><?= $ICONS['cp'] ?></button>
+          <button onclick="p('mv', null)" class="ab" title="<?= T('mv') ?>"><?= $ICONS['mv'] ?></button>
+          <button onclick="p('rm', null)" class="ab del" title="<?= T('rm') ?>"><?= $ICONS['rm'] ?></button>
         </div>
       </div>
       <div class="main">
@@ -1269,19 +1271,19 @@ class Dav {
                 <input type="checkbox" class="chk sel-item" value="<?= htmlspecialchars($f) ?>" onchange="updB()">
               </td>
               <td>
-                <a href="<?= $lk ?>" class="lnk" target="<?= $d ?'_self' : '_blank' ?>"><?= $d ? $I['d'] : $I['f'] ?><?= htmlspecialchars($f) ?><?php if($shr): ?><span class="badge <?= $stCls[$st] ?>"><?= $stTxt [$st] ?></span><?php endif; ?></a>
+                <a href="<?= $lk ?>" class="lnk" target="<?= $d ?'_self' : '_blank' ?>"><?= $d ? $ICONS['d'] : $ICONS['f'] ?><?= htmlspecialchars($f) ?><?php if($shr): ?><span class="badge <?= $stCls[$st] ?>"><?= $stTxt [$st] ?></span><?php endif; ?></a>
               </td>
               <td class="hm"><?= $d?'-':$this->size(filesize($p)) ?></td>
               <td class="hm"><?= date('Y-m-d H:i',filemtime($p)) ?></td>
               <td>
                 <div class="acts">
-                  <?php if(!$d): ?><a href="<?= $lk ?>?dl=1" class="ab" title="<?= T('download') ?>"><?= $I['download'] ?></a>
-                  <button onclick="shareFile('<?= addslashes($f) ?>','<?= $sTok ?>',<?= $shr ? $shr['expires'] : 0 ?>,<?= $shr ? $shr['max_uses'] : 0 ?>,<?= $shr ? $shr['uses'] : 0 ?>,<?= $shr ? $shr['start_ts'] : 0 ?>)" class="ab" title="<?= T('sh') ?>"><?= $I['sh'] ?></button>
+                  <?php if(!$d): ?><a href="<?= $lk ?>?dl=1" class="ab" title="<?= T('download') ?>"><?= $ICONS['download'] ?></a>
+                  <button onclick="shareFile('<?= addslashes($f) ?>','<?= $sTok ?>',<?= $shr ? $shr['expires'] : 0 ?>,<?= $shr ? $shr['max_uses'] : 0 ?>,<?= $shr ? $shr['uses'] : 0 ?>,<?= $shr ? $shr['start_ts'] : 0 ?>)" class="ab" title="<?= T('sh') ?>"><?= $ICONS['sh'] ?></button>
                   <?php endif; ?>
-                  <button onclick="p('rn','<?= $f ?>')" class="ab" title="<?= T('rn') ?>"><?= $I['ed'] ?></button>
-                  <button onclick="p('cp','<?= $f ?>')" class="ab" title="<?= T('cp') ?>"><?= $I['cp'] ?></button>
-                  <button onclick="p('mv','<?= $f ?>')" class="ab" title="<?= T('mv') ?>"><?= $I['mv'] ?></button>
-                  <button onclick="p('rm','<?= $f ?>')" class="ab del" title="<?= T('rm') ?>"><?= $I['rm'] ?></button>
+                  <button onclick="p('rn','<?= $f ?>')" class="ab" title="<?= T('rn') ?>"><?= $ICONS['ed'] ?></button>
+                  <button onclick="p('cp','<?= $f ?>')" class="ab" title="<?= T('cp') ?>"><?= $ICONS['cp'] ?></button>
+                  <button onclick="p('mv','<?= $f ?>')" class="ab" title="<?= T('mv') ?>"><?= $ICONS['mv'] ?></button>
+                  <button onclick="p('rm','<?= $f ?>')" class="ab del" title="<?= T('rm') ?>"><?= $ICONS['rm'] ?></button>
                 </div>
               </td>
             </tr>
@@ -1363,17 +1365,17 @@ class Dav {
 
         const users = <?=json_encode(array_keys($ac['users']??[]))?>;
         const admin = '<?=$ac['admin']??''?>';
-        const currentUser = '<?=$u?>';
+        const currentUser = '<?= $u ?>';
 
         let h = '<div class="form-group"><label class="form-label"><?=T('user_list')?></label><div style="max-height:200px;overflow-y:auto;border:1px solid var(--bd);border-radius:8px;padding:8px">';
         users.forEach(user => {
           const isAdmin = user === admin;
           h += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--bd)"><span>${user}${user===currentUser?' <span style="color:var(--p)">(<?=T('user_current')?>)</span>':''}${isAdmin?' <span class="badge ok">Admin</span>':''}</span><div>`;
           if(!isAdmin){
-            h += `<button class="ab" onclick="userAction('chpass','${user}')" title="<?=T('user_chpass')?>"><?=$ICONS['ed']?></button>`;
-            h += `<button class="ab" onclick="userAction('setadmin','${user}')" title="<?=T('user_admin')?>"><?=$ICONS['user']?></button>`;
+            h += `<button class="ab" onclick="userAction('chpass','${user}')" title="<?=T('user_chpass')?>"><?= $ICONS['ed'] ?></button>`;
+            h += `<button class="ab" onclick="userAction('setadmin','${user}')" title="<?=T('user_admin')?>"><?= $ICONS['user'] ?></button>`;
             if(user !== currentUser){
-              h += `<button class="ab del" onclick="userAction('delete','${user}')" title="<?=T('user_del')?>"><?=$ICONS['delete']?></button>`;
+              h += `<button class="ab del" onclick="userAction('delete','${user}')" title="<?=T('user_del')?>"><?= $ICONS['delete'] ?></button>`;
             }
           }
           h += '</div></div>';
