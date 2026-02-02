@@ -211,7 +211,7 @@ log_action('LOGIN', 'User: '.$u, $u);
 
 // --- UI & Translation ---
 $lang = $_COOKIE['l'] ?? 'de';
-$L=['cn'=> ['home'=>'首页','back'=>'返回上级','up'=>'上传文件','up_folder'=>'文件夹','new'=>'新建文件夹','cr'=>'创建','nm'=>'名称','sz'=>'大小','tm'=>'修改时间','ac'=>'操作','dl'=>'下载','rn'=>'重命名','cp'=>'复制','mv'=>'移动','rm'=>'删除','sh'=>'分享','emp'=>'空目录','tip'=>'确认执行操作','lnk'=>'直链地址','cpl'=>'复制链接','ok'=>'确定','cc'=>'取消','tar'=>'目标路径','sh_m'=>'分享管理','sh_new'=>'新建分享','sh_up'=>'更新设置','sh_rnd'=>'随机生成','sh_cus'=>'自定义','sh_del'=>'取消分享','sh_ok'=>'链接已复制','exp'=>'有效期','uses'=>'使用情况','unlimited'=>'无限制','days'=>'天','hours'=>'小时','mins'=>'分钟','max_uses'=>'最大次数','set'=>'设置','link_copied'=>'链接已复制','exp_never'=>'永不过期','exp_1d'=>'1天','exp_7d'=>'7天','exp_30d'=>'30天','uses_1'=>'1次','uses_5'=>'5次','uses_10'=>'10次','uses_50'=>'50次','custom'=>'自定义','sharing'=>'分享设置','save'=>'保存','modify'=>'修改配置','log_title'=>'操作日志','log_download'=>'下载日志','log_clear'=>'清空日志','st_exp'=>'已过期','st_ok'=>'分享中','st_wait'=>'未开始','stat'=>'统计信息','exp_at'=>'到期时间','start_at'=>'生效时间','used'=>'已用','delay'=>'生效延时','delay_none'=>'立即生效','delay_10m'=>'10分钟后','delay_1h'=>'1小时后','path_ph'=>'输入路径按回车跳转...','pwd'=>'访问密码','pwd_ph'=>'留空则无密码','sel_all'=>'全选','batch'=>'批量操作','del_sel'=>'删除选中','drag_tip'=>'释放以上传文件'],'en'=>['home'=>'Home','back'=>'Back','up'=>'Upload File','up_folder'=>'Folder','new'=>'New Folder','cr'=>'Create','nm'=>'Name','sz'=>'Size','tm'=>'Modified','ac'=>'Actions','dl'=>'Download','rn'=>'Rename','cp'=>'Copy','mv'=>'Move','rm'=>'Delete','sh'=>'Share','emp'=>'Empty','tip'=>'Confirm Action','lnk'=>'Link','cpl'=>'Copy Link','ok'=>'OK','cc'=>'Cancel','tar'=>'Target Path','sh_m'=>'Share Manager','sh_new'=>'New Share','sh_up'=>'Update Settings','sh_rnd'=>'Random','sh_cus'=>'Custom','sh_del'=>'Unshare','sh_ok'=>'Link Copied','exp'=>'Expires In','uses'=>'Usage','unlimited'=>'Unlimited','days'=>'days','hours'=>'hours','mins'=>'minutes','max_uses'=>'Max Uses','set'=>'Settings','link_copied'=>'Link copied','exp_never'=>'Never','exp_1d'=>'1 day','exp_7d'=>'7 days','exp_30d'=>'30 days','uses_1'=>'1 use','uses_5'=>'5 uses','uses_10'=>'10 uses','uses_50'=>'50 uses','custom'=>'Custom','sharing'=>'Sharing Settings','save'=>'Save','modify'=>'Modify Share','log_title'=>'Operation Logs','log_download'=>'Download Log','log_clear'=>'Clear Log','st_exp'=>'EXPIRED','st_ok'=>'SHARED','st_wait'=>'WAITING','stat'=>'Statistics','exp_at'=>'Expires At','start_at'=>'Starts At','used'=>'Used','delay'=>'Start Delay','delay_none'=>'Immediate','delay_10m'=>'In 10 mins','delay_1h'=>'In 1 hour','path_ph'=>'Type path and hit Enter...','pwd'=>'Password','pwd_ph'=>'Empty = No Password','sel_all'=>'Select All','batch'=>'Batch','del_sel'=>'Delete Selected','drag_tip'=>'Drop to Upload'],'de'=>['home'=>'Start','back'=>'Zurück','up'=>'Datei hochladen','up_folder'=>'Verzeichnis','new'=>'Neues Verzeichnis','cr'=>'Erstellen','nm'=>'Name','sz'=>'Größe','tm'=>'Verändert','ac'=>'Aktionen','dl'=>'Download','rn'=>'Umbenennen','cp'=>'Kopieren','mv'=>'Verschieben','rm'=>'Löschen','sh'=>'Teilen','emp'=>'Leer','tip'=>'Aktion bestätigen','lnk'=>'Link','cpl'=>'Link kopieren','ok'=>'OK','cc'=>'Abbrechen','tar'=>'Zielpfad','sh_m'=>'Freigaben-Manager','sh_new'=>'Neue Freigabe','sh_up'=>'Einstellungen aktualisieren','sh_rnd'=>'Zufällig','sh_cus'=>'Benutzerdefiniert','sh_del'=>'Freigabe löschen','sh_ok'=>'Link kopiert','exp'=>'Läuft ab in','uses'=>'Verwendung','unlimited'=>'Unbegrenzt','days'=>'Tage','hours'=>'Stunden','mins'=>'Minuten','max_uses'=>'Maximale Nutzung','set'=>'Einstellungen','link_copied'=>'Link kopiert','exp_never'=>'Nie','exp_1d'=>'1 Tag','exp_7d'=>'7 Tage','exp_30d'=>'30 Tage','uses_1'=>'1 use','uses_5'=>'5 uses','uses_10'=>'10 uses','uses_50'=>'50 uses','custom'=>'Benutzerdefiniert','sharing'=>'Freigaben Einstellungen','save'=>'Speichern','modify'=>'Freigabe verändern','log_title'=>'Nutzungsprotokoll','log_download'=>'Download Protokoll','log_clear'=>'Protokoll zurücksetzen','st_exp'=>'ABGELAUFEN','st_ok'=>'GETEILT','st_wait'=>'WARTEN','stat'=>'Statistik','exp_at'=>'Ablaufdatum','start_at'=>'Beginnt bei','used'=>'Verwendet','delay'=>'Startverzögerung','delay_none'=>'Sofort','delay_10m'=>'In 10 Minute','delay_1h'=>'In 1 Stunde','path_ph'=>'Pfad eingeben und mit Enter bestätigen...','pwd'=>'Passwort','pwd_ph'=>'Empty = Kein Passwort','sel_all'=>'Alle auswählen','batch'=>'Stapelverarbeitung','del_sel'=>'Ausgewählte löschen','drag_tip'=>'Ablegen zum Hochladen']];
+$L=['cn'=> ['home'=>'首页','back'=>'返回上级','up'=>'上传文件','up_folder'=>'文件夹','new'=>'新建文件夹','cr'=>'创建','nm'=>'名称','sz'=>'大小','tm'=>'修改时间','ac'=>'操作','dl'=>'下载','rn'=>'重命名','cp'=>'复制','mv'=>'移动','rm'=>'删除','sh'=>'分享','emp'=>'空目录','tip'=>'确认执行操作','lnk'=>'直链地址','cpl'=>'复制链接','ok'=>'确定','cc'=>'取消','tar'=>'目标路径','sh_m'=>'分享管理','sh_new'=>'新建分享','sh_up'=>'更新设置','sh_rnd'=>'随机生成','sh_cus'=>'自定义','sh_del'=>'取消分享','sh_ok'=>'链接已复制','exp'=>'有效期','uses'=>'使用情况','unlimited'=>'无限制','days'=>'天','hours'=>'小时','mins'=>'分钟','max_uses'=>'最大次数','set'=>'设置','link_copied'=>'链接已复制','exp_never'=>'永不过期','exp_1d'=>'1天','exp_7d'=>'7天','exp_30d'=>'30天','uses_1'=>'1次','uses_5'=>'5次','uses_10'=>'10次','uses_50'=>'50次','custom'=>'自定义','sharing'=>'分享设置','save'=>'保存','modify'=>'修改配置','log_title'=>'操作日志','log_download'=>'下载日志','log_clear'=>'清空日志','st_exp'=>'已过期','st_ok'=>'分享中','st_wait'=>'未开始','stat'=>'统计信息','exp_at'=>'到期时间','start_at'=>'生效时间','used'=>'已用','delay'=>'生效延时','delay_none'=>'立即生效','delay_10m'=>'10分钟后','delay_1h'=>'1小时后','path_ph'=>'输入路径按回车跳转...','pwd'=>'访问密码','pwd_ph'=>'留空则无密码','sel_all'=>'全选','batch'=>'批量操作','del_sel'=>'删除选中','drag_tip'=>'释放以上传文件'],'en'=>['home'=>'Home','back'=>'Back','up'=>'Upload File','up_folder'=>'Folder','new'=>'New Folder','cr'=>'Create','nm'=>'Name','sz'=>'Size','tm'=>'Modified','ac'=>'Actions','dl'=>'Download','rn'=>'Rename','cp'=>'Copy','mv'=>'Move','rm'=>'Delete','sh'=>'Share','emp'=>'Empty','tip'=>'Confirm Action','lnk'=>'Link','cpl'=>'Copy Link','ok'=>'OK','cc'=>'Cancel','tar'=>'Target Path','sh_m'=>'Share Manager','sh_new'=>'New Share','sh_up'=>'Update Settings','sh_rnd'=>'Random','sh_cus'=>'Custom','sh_del'=>'Unshare','sh_ok'=>'Link Copied','exp'=>'Expires In','uses'=>'Usage','unlimited'=>'Unlimited','days'=>'days','hours'=>'hours','mins'=>'minutes','max_uses'=>'Max Uses','set'=>'Settings','link_copied'=>'Link copied','exp_never'=>'Never','exp_1d'=>'1 day','exp_7d'=>'7 days','exp_30d'=>'30 days','uses_1'=>'1 use','uses_5'=>'5 uses','uses_10'=>'10 uses','uses_50'=>'50 uses','custom'=>'Custom','sharing'=>'Sharing Settings','save'=>'Save','modify'=>'Modify Share','log_title'=>'Operation Logs','log_download'=>'Download Log','log_clear'=>'Clear Log','st_exp'=>'EXPIRED','st_ok'=>'SHARED','st_wait'=>'WAITING','stat'=>'Statistics','exp_at'=>'Expires At','start_at'=>'Starts At','used'=>'Used','delay'=>'Start Delay','delay_none'=>'Immediate','delay_10m'=>'In 10 mins','delay_1h'=>'In 1 hour','path_ph'=>'Type path and hit Enter...','pwd'=>'Password','pwd_ph'=>'Empty = No Password','sel_all'=>'Select All','batch'=>'Batch','del_sel'=>'Delete Selected','drag_tip'=>'Drop to Upload'],'de'=>['home'=>'Start','back'=>'Zurück','up'=>'Datei hochladen','up_folder'=>'Verzeichnis hochladen','new'=>'Neues Verzeichnis','cr'=>'Erstellen','nm'=>'Name','sz'=>'Größe','tm'=>'Verändert','ac'=>'Aktionen','dl'=>'Download','rn'=>'Umbenennen','cp'=>'Kopieren','mv'=>'Verschieben','rm'=>'Löschen','sh'=>'Teilen','emp'=>'Leer','tip'=>'Aktion bestätigen','lnk'=>'Link','cpl'=>'Link kopieren','ok'=>'OK','cc'=>'Abbrechen','tar'=>'Zielpfad','sh_m'=>'Freigaben-Manager','sh_new'=>'Neue Freigabe','sh_up'=>'Einstellungen aktualisieren','sh_rnd'=>'Zufällig','sh_cus'=>'Benutzerdefiniert','sh_del'=>'Freigabe löschen','sh_ok'=>'Link kopiert','exp'=>'Läuft ab in','uses'=>'Verwendung','unlimited'=>'Unbegrenzt','days'=>'Tage','hours'=>'Stunden','mins'=>'Minuten','max_uses'=>'Maximale Nutzung','set'=>'Einstellungen','link_copied'=>'Link kopiert','exp_never'=>'Nie','exp_1d'=>'1 Tag','exp_7d'=>'7 Tage','exp_30d'=>'30 Tage','uses_1'=>'1 use','uses_5'=>'5 uses','uses_10'=>'10 uses','uses_50'=>'50 uses','custom'=>'Benutzerdefiniert','sharing'=>'Freigaben Einstellungen','save'=>'Speichern','modify'=>'Freigabe verändern','log_title'=>'Nutzungsprotokoll','log_download'=>'Download Protokoll','log_clear'=>'Protokoll zurücksetzen','st_exp'=>'ABGELAUFEN','st_ok'=>'GETEILT','st_wait'=>'WARTEN','stat'=>'Statistik','exp_at'=>'Ablaufdatum','start_at'=>'Beginnt bei','used'=>'Verwendet','delay'=>'Startverzögerung','delay_none'=>'Sofort','delay_10m'=>'In 10 Minute','delay_1h'=>'In 1 Stunde','path_ph'=>'Pfad eingeben und mit Enter bestätigen...','pwd'=>'Passwort','pwd_ph'=>'Empty = Kein Passwort','sel_all'=>'Alle auswählen','batch'=>'Stapelverarbeitung','del_sel'=>'Ausgewählte löschen','drag_tip'=>'Ablegen zum Hochladen']];
 
 if(isset($_GET['l'])){setcookie('l',$_GET['l'],time()+31536000);header("Location: ".BASE.'/'.S_NAME);exit;}
 function T($k){global $L,$lang;return $L[$lang][$k]??$k;}
@@ -444,7 +444,8 @@ class Dav {
   }
 
   private function PUT(){
-    global $u;if($this->isDenied(basename($this->path))){http_response_code(403);exit;}
+    global $u;
+    if($this->isDenied(basename($this->path))){http_response_code(403);exit;}
     if(!is_dir(dirname($this->path))) mkdir(dirname($this->path),0755,true);
     $i=fopen('php://input','r');$o=fopen($this->path,'w');
     if($i&&$o){stream_copy_to_stream($i,$o);fclose($i);fclose($o);log_action('WEBDAV_PUT', basename($this->path), $u);http_response_code(201);}else http_response_code(500);
@@ -502,7 +503,34 @@ class Dav {
     if(isset($_SERVER['HTTP_RANGE'])){http_response_code(206);$size=filesize($this->path);list($start,$end)=explode('-',substr($_SERVER['HTTP_RANGE'],6));$start=intval($start);$end=$end?min(intval($end),$size-1):$size-1;header("Content-Range: bytes $start-$end/$size");}
   }
 
-  private function mime($f){$x=strtolower(pathinfo($f,4));$m=['txt'=>'text/plain','html'=>'text/html','css'=>'text/css','js'=>'application/javascript','json'=>'application/json','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','png'=>'image/png','gif'=>'image/gif','mp4'=>'video/mp4','pdf'=>'application/pdf','zip'=>'application/zip'];return $m[$x]??'application/octet-stream';}
+#  private function mime($f){$x=strtolower(pathinfo($f,4));$m=['txt'=>'text/plain','html'=>'text/html','css'=>'text/css','js'=>'application/javascript','json'=>'application/json','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','png'=>'image/png','gif'=>'image/gif','mp4'=>'video/mp4','pdf'=>'application/pdf','zip'=>'application/zip'];return $m[$x]??'application/octet-stream';}
+  private function mime($f) {
+    if (file_exists($f) && function_exists('finfo_open')) {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $f);
+        finfo_close($finfo);
+
+        if ($mime) return $mime;
+    }
+
+    $ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
+    $map = [
+        'txt' => 'text/plain',
+        'html' => 'text/html',
+        'css' => 'text/css',
+        'js' => 'application/javascript',
+        'json' => 'application/json',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'gif' => 'image/gif',
+        'mp4' => 'video/mp4',
+        'pdf' => 'application/pdf',
+        'zip' => 'application/zip'
+    ];
+
+    return $map[$ext] ?? 'application/octet-stream';
+  }
 
   private function size($b){$u=['B','KB','MB','GB'];$i=0;while($b>=1024&&$i<3){$b/=1024;$i++;}return round($b,2).' '.$u[$i];}
 
@@ -520,8 +548,20 @@ class Dav {
          return 1;
     };
 
-    $I=['f'=>'<svg class="i" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg>','d'=>'<svg class="i" viewBox="0 0 24 24" style="color:#facc15"><path fill="currentColor" d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>','dl'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>','sh'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>','ed'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>','cp'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>','mv'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/></svg>','rm'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>','log'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>','bat'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>','up_f'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10zm-7.01-5l-1.41-1.41 2.01-2.01h-2.83v-2h2.83l-2.01-2.01 1.41-1.41 4.42 4.42-4.42 4.42z"/></svg>'];
-      ?>
+  $ICONS=[
+    'file'=>'<svg class="i" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg>',
+    'directory'=>'<svg class="i" viewBox="0 0 24 24" style="color:#facc15"><path fill="currentColor" d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>',
+    'dl'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>',
+    'sh'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>',
+    'ed'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>',
+    'cp'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>',
+    'mv'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/></svg>',
+    'rm'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
+    'log'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>',
+    'bat'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>',
+    'up_f'=>'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10zm-7.01-5l-1.41-1.41 2.01-2.01h-2.83v-2h2.83l-2.01-2.01 1.41-1.41 4.42 4.42-4.42 4.42z"/></svg>'
+  ];
+?>
   <!DOCTYPE html>
   <html lang="<?=$lang?>">
     <head>
@@ -621,9 +661,19 @@ class Dav {
             <input class="nav-input" id="pathBar" value="<?=$this->req==='/'?'':ltrim($this->req,'/')?>" placeholder="<?=T('path_ph')?>" onkeydown="if(event.key==='Enter') goToPath(this.value)">
           </div>
           <div style="display:flex;gap:14px;align-items:center">
-            <?php if(LOG_ENABLED): ?><a href="#" onclick="showLogs()" class="ab" title="<?=T('log_title')?>" style="padding:8px"><?=$I['log']?></a><?php endif; ?>
-            <button class="tg" onclick="mode()"><svg class="float-icon" width="24" height="24" viewBox="0 0 24 24" fill="#FDB813"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
-            <div style="font-size:13px;font-weight:600"><a href="?l=de" style="text-decoration:none;color:<?=$lang=='de'?'var(--p)':'#78909c'?>">DE</a> <span style="color:#cfd8dc">|</span><a href="?l=cn" style="text-decoration:none;color:<?=$lang=='cn'?'var(--p)':'#78909c'?>">CN</a> <span style="color:#cfd8dc">|</span> <a href="?l=en" style="text-decoration:none;color:<?=$lang=='en'?'var(--p)':'#78909c'?>">EN</a></div>
+            <?php if(LOG_ENABLED): ?><a href="#" onclick="showLogs()" class="ab" title="<?=T('log_title')?>" style="padding:8px"><?=$ICONS['log']?></a><?php endif; ?>
+            <button class="tg" onclick="mode()">
+              <svg class="float-icon" width="24" height="24" viewBox="0 0 24 24" fill="#FDB813">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+            <div style="font-size:13px;font-weight:600">
+              <a href="?l=de" style="text-decoration:none;color:<?=$lang=='de'?'var(--p)':'#78909c'?>">DE</a>
+              &nbsp;<span style="color:#cfd8dc">|</span>
+              &nbsp;<a href="?l=en" style="text-decoration:none;color:<?=$lang=='en'?'var(--p)':'#78909c'?>">EN</a>
+              &nbsp;<span style="color:#cfd8dc">|</span>
+              &nbsp;<a href="?l=cn" style="text-decoration:none;color:<?=$lang=='cn'?'var(--p)':'#78909c'?>">CN</a>
+            </div>
           </div>
         </header>
         <div class="bar">
@@ -633,16 +683,24 @@ class Dav {
           <form method="post" enctype="multipart/form-data" style="margin:0;display:flex">
             <input type="hidden" name="t" value="<?=$csrf?>"><input type="hidden" name="cur_dir" value="<?=$this->req?>">
             <div class="btn-group">
-                <label class="btn bp" title="<?=T('up')?>"><?=T('up')?><input type="file" name="f[]" hidden multiple onchange="this.form.submit()"></label>
-                <label class="btn bp" title="<?=T('up_folder')?>"><?=T('up_folder')?><input type="file" name="f[]" hidden multiple webkitdirectory mozdirectory onchange="this.form.submit()"></label>
+                <label class="btn bp" title="<?=T('up')?>"><?=T('up')?>
+                  <input type="file" name="f[]" hidden multiple onchange="this.form.submit()">
+                </label>
+                <label class="btn bp" title="<?=T('up_folder')?>"><?=T('up_folder')?>
+                  <input type="file" name="f[]" hidden multiple webkitdirectory mozdirectory onchange="this.form.submit()">
+                </label>
             </div>
           </form>
-          <form method="post" style="display:flex;gap:8px;margin:0;flex:1"><input type="hidden" name="t" value="<?=$csrf?>"><input type="hidden" name="cur_dir" value="<?=$this->req?>"><input name="md" placeholder="<?=T('new')?>" required style="padding:8px 12px;border:2px solid var(--bd);border-radius:8px;outline:none;background:rgba(255,255,255,0.8);color:var(--tx);flex:1;min-width:100px;max-width:200px;font-size:14px"><button class="btn"><?=T('cr')?></button></form>
+          <form method="post" style="display:flex;gap:8px;margin:0;flex:1">
+            <input type="hidden" name="t" value="<?=$csrf?>"><input type="hidden" name="cur_dir" value="<?=$this->req?>">
+            <input name="md" placeholder="<?=T('new')?>" required style="padding:8px 12px;border:2px solid var(--bd);border-radius:8px;outline:none;background:transparent;color:var(--tx);flex:1;min-width:100px;max-width:200px;font-size:14px">
+            <button class="btn"><?=T('cr')?></button>
+          </form>
           <div id="batch_acts" class="batch-bar">
             <span><?=T('batch')?>:</span>
-            <button onclick="p('cp', null)" class="ab" title="<?=T('cp')?>"><?=$I['cp']?></button>
-            <button onclick="p('mv', null)" class="ab" title="<?=T('mv')?>"><?=$I['mv']?></button>
-            <button onclick="p('rm', null)" class="ab del" title="<?=T('rm')?>"><?=$I['rm']?></button>
+            <button onclick="p('cp', null)" class="ab" title="<?=T('cp')?>"><?=$ICONS['cp']?></button>
+            <button onclick="p('mv', null)" class="ab" title="<?=T('mv')?>"><?=$ICONS['mv']?></button>
+            <button onclick="p('rm', null)" class="ab del" title="<?=T('rm')?>"><?=$ICONS['rm']?></button>
           </div>
         </div>
         <div class="main">
@@ -657,11 +715,11 @@ class Dav {
               $sTok=$shr?$sm[$rp]:''; $st=$chkSt($shr); $stCls=['','ok','exp','wait']; $stTxt=['',T('st_ok'),T('st_exp'),T('st_wait')]; ?>
               <tr>
                 <td style="padding-right:0"><input type="checkbox" class="chk sel-item" value="<?=htmlspecialchars($f)?>" onchange="updB()"></td>
-                <td><a href="<?=$lk?>" class="lnk" target="<?=$d?'_self':'_blank'?>"><?=$d?$I['d']:$I['f']?><?=htmlspecialchars($f)?><?php if($shr): ?><span class="badge <?=$stCls[$st]?>"><?=$stTxt[$st]?></span><?php endif; ?></a></td>
+                <td><a href="<?=$lk?>" class="lnk" target="<?=$d?'_self':'_blank'?>"><?=$d?$ICONS['directory']:$ICONS['file']?><?=htmlspecialchars($f)?><?php if($shr): ?><span class="badge <?=$stCls[$st]?>"><?=$stTxt[$st]?></span><?php endif; ?></a></td>
                 <td class="hm"><?=$d?'-':$this->size(filesize($p))?></td><td class="hm"><?=date('Y-m-d H:i',filemtime($p))?></td>
                 <td><div class="acts">
-                    <?php if(!$d): ?><a href="<?=$lk?>?dl=1" class="ab" title="<?=T('dl')?>"><?=$I['dl']?></a><button onclick="shareFile('<?=addslashes($f)?>','<?=$sTok?>',<?=$shr?$shr['expires']:0?>,<?=$shr?$shr['max_uses']:0?>,<?=$shr?$shr['uses']:0?>,<?=$shr?$shr['start_ts']:0?>)" class="ab" title="<?=T('sh')?>"><?=$I['sh']?></button><?php endif; ?>
-                    <button onclick="p('rn','<?=$f?>')" class="ab" title="<?=T('rn')?>"><?=$I['ed']?></button><button onclick="p('cp','<?=$f?>')" class="ab" title="<?=T('cp')?>"><?=$I['cp']?></button><button onclick="p('mv','<?=$f?>')" class="ab" title="<?=T('mv')?>"><?=$I['mv']?></button><button onclick="p('rm','<?=$f?>')" class="ab del" title="<?=T('rm')?>"><?=$I['rm']?></button>
+                    <?php if(!$d): ?><a href="<?=$lk?>?dl=1" class="ab" title="<?=T('dl')?>"><?=$ICONS['dl']?></a><button onclick="shareFile('<?=addslashes($f)?>','<?=$sTok?>',<?=$shr?$shr['expires']:0?>,<?=$shr?$shr['max_uses']:0?>,<?=$shr?$shr['uses']:0?>,<?=$shr?$shr['start_ts']:0?>)" class="ab" title="<?=T('sh')?>"><?=$ICONS['sh']?></button><?php endif; ?>
+                    <button onclick="p('rn','<?=$f?>')" class="ab" title="<?=T('rn')?>"><?=$ICONS['ed']?></button><button onclick="p('cp','<?=$f?>')" class="ab" title="<?=T('cp')?>"><?=$ICONS['cp']?></button><button onclick="p('mv','<?=$f?>')" class="ab" title="<?=T('mv')?>"><?=$ICONS['mv']?></button><button onclick="p('rm','<?=$f?>')" class="ab del" title="<?=T('rm')?>"><?=$ICONS['rm']?></button>
                 </div></td>
               </tr>
               <?php endforeach; endif; ?>
@@ -735,7 +793,7 @@ class Dav {
           if(a=='rm') h='<p><?=T('tip')?> '+(items.length>1?'<?=T('del_sel')?> ('+items.length+')':'"'+items[0]+'"')+'?</p>';
           else {
             if(a=='rn' && items.length > 1) { alert('Rename one at a time'); cl(); return; }
-            h='<input id="iv" value="'+(a=='rn'?items[0]:cur)+'" style="width:100%;padding:12px 16px;border:2px solid var(--bd);border-radius:10px;background:rgba(255,255,255,0.8);color:var(--tx);box-sizing:border-box" placeholder="'+(a=='rn'?'<?=T('nm')?>':'<?=T('tar')?>')+'">';
+            h='<input id="iv" value="'+(a=='rn'?items[0]:cur)+'" style="width:100%;padding:12px 16px;border:2px solid var(--bd);border-radius:6px;background:transparent;color:var(--tx);box-sizing:border-box;transition:all 0.2s" placeholder="'+(a=='rn'?'<?=T('nm')?>':'<?=T('tar')?>')+'">';
           }
           $('mc').innerHTML=h;if($('iv')) setTimeout(()=>$('iv').focus(),50);
           $('mok').className='btn '+(a=='rm'?'bd':'bp');$('mok').innerText=a=='rm'?'<?=T('rm')?>':'<?=T('ok')?>';$('mok').style.display='inline-flex';
