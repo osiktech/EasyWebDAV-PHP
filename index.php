@@ -545,7 +545,7 @@ class Dav {
         .btn:hover{border-color:var(--p);color:var(--p);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
         .bp{background:var(--p);color:#fff;border:none}
         .bp:hover{background:var(--pd);color:#fff;transform:translateY(-1px);box-shadow:0 4px 14px rgba(92,107,192,0.3)}
-        .bd{color:var(--er);border-color:transparent}
+        .bd{color:var(--er)/**;border-color:transparent**/}
         .bd:hover{background:var(--er);color:#fff}
         .btn-group{display:flex;align-items:center;box-shadow:0 2px 4px rgba(0,0,0,0.04);border-radius:8px;overflow:hidden}
         .btn-group .btn{border-radius:0;margin:0;box-shadow:none;border-right:1px solid rgba(255,255,255,0.2)}
