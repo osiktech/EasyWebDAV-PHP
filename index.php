@@ -503,7 +503,6 @@ class Dav {
     if(isset($_SERVER['HTTP_RANGE'])){http_response_code(206);$size=filesize($this->path);list($start,$end)=explode('-',substr($_SERVER['HTTP_RANGE'],6));$start=intval($start);$end=$end?min(intval($end),$size-1):$size-1;header("Content-Range: bytes $start-$end/$size");}
   }
 
-#  private function mime($f){$x=strtolower(pathinfo($f,4));$m=['txt'=>'text/plain','html'=>'text/html','css'=>'text/css','js'=>'application/javascript','json'=>'application/json','jpg'=>'image/jpeg','jpeg'=>'image/jpeg','png'=>'image/png','gif'=>'image/gif','mp4'=>'video/mp4','pdf'=>'application/pdf','zip'=>'application/zip'];return $m[$x]??'application/octet-stream';}
   private function mime($f) {
     if (file_exists($f) && function_exists('finfo_open')) {
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
