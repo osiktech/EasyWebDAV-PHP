@@ -13,7 +13,7 @@ define('LOG_PATH', __DIR__.'/logs');
 @error_reporting(0);
 @set_time_limit(0);
 @ignore_user_abort(true);
-date_default_timezone_set('UTC');
+date_default_timezone_set('Europe/Berlin');
 
 // --- Environment Init ---
 if(LOG_ENABLED && !file_exists(LOG_PATH)) @mkdir(LOG_PATH, 0755, true);
@@ -909,14 +909,16 @@ class Dav {
       echo '<D:response><D:href>'.htmlspecialchars($href,ENT_XML1).'</D:href><D:propstat><D:prop>';
       echo '<D:displayname>'.htmlspecialchars(basename($f),ENT_XML1).'</D:displayname>';
       echo '<D:getlastmodified>'.gmdate('D, d M Y H:i:s T',filemtime($f)).'</D:getlastmodified>';
-      echo '<D:getetag>"'.hash_file('md5',$f).'"</D:getetag>';echo '<D:creationdate>'.gmdate('Y-m-d\\TH:i:s\\Z',filectime($f)).'</D:creationdate>';
+      echo '<D:creationdate>'.gmdate('Y-m-d\\TH:i:s\\Z',filectime($f)).'</D:creationdate>';
       if(is_dir($f)) {
         echo '<D:resourcetype><D:collection/></D:resourcetype>';
         echo '<D:getcontentlength/>';
+        echo '<D:getetag>"'.md5($f).'"</D:getetag>';
       } else {
         echo '<D:resourcetype/>';
         echo '<D:getcontentlength>'.filesize($f).'</D:getcontentlength>';
         echo '<D:getcontenttype>'.$this->mime($f).'</D:getcontenttype>';
+        echo '<D:getetag>"'.hash_file('md5',$f).'"</D:getetag>';
       }
       echo '<D:supportedlock><D:lockentry><D:lockscope><D:exclusive/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry><D:lockentry><D:lockscope><D:shared/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry></D:supportedlock>';
       echo '<D:lockdiscovery/>';
