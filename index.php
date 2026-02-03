@@ -855,10 +855,21 @@ class Dav {
   }
 
   private function PUT() {
-    global $u;if($this->isDenied(basename($this->path))) {http_response_code(403);exit;}
-    if(!is_dir(dirname($this->path))) mkdir(dirname($this->path),0755,true);
-    $i=fopen('php://input','r');$o=fopen($this->path,'w');
-    if($i&&$o) {stream_copy_to_stream($i,$o);fclose($i);fclose($o);log_action('WEBDAV_PUT', basename($this->path), $u);http_response_code(201);}else http_response_code(500);
+    global $u;
+    if($this->isDenied(basename($this->path))) {
+      http_response_code(403);
+      exit;
+    }
+    if(!is_dir(dirname($this->path))) mkdir(dirname($this->path), 0755, true);
+    $i = fopen('php://input', 'r');
+    $o = fopen($this->path, 'w');
+    if($i && $o) {
+      stream_copy_to_stream($i, $o);
+      fclose($i);
+      fclose($o);
+      log_action('WEBDAV_PUT', basename($this->path), $u);
+      http_response_code(201);
+    } else http_response_code(500);
   }
 
   private function DELETE() {
@@ -878,8 +889,8 @@ class Dav {
       http_response_code(405);
       exit;
     }
-    if(!is_dir(dirname($this->path))) mkdir(dirname($this->path),0755,true);
-    if(mkdir($this->path,0755,true)) {
+    if(!is_dir(dirname($this->path))) mkdir(dirname($this->path), 0755, true);
+    if(mkdir($this->path, 0755, true)) {
       log_action('WEBDAV_MKCOL', $this->req, $u);
       http_response_code(201);
     } else http_response_code(409);
@@ -892,24 +903,24 @@ class Dav {
     }
     header('HTTP/1.1 207 Multi-Status');
     header('Content-Type: application/xml; charset="utf-8"');
-    $depth=$_SERVER['HTTP_DEPTH']??'1';
-    if($depth==='infinity') {
+    $depth = $_SERVER['HTTP_DEPTH'] ?? '1';
+    if($depth === 'infinity') {
       http_response_code(403);
       exit;
     }
     echo '<?xml version="1.0" encoding="utf-8"?><D:multistatus xmlns:D="DAV:">';
-    $items=[$this->path];
+    $items = [$this->path];
     if($depth !== '0' && is_dir($this->path)) {
-      $items=array_merge($items,glob($this->path.'/*'));
+      $items = array_merge($items, glob($this->path.'/*'));
     }
     foreach($items as $f) {
       if(!file_exists($f) || $this->isDenied(basename($f))) continue;
-      $rel=str_replace('\\','/',substr($f,strlen(S_PATH)));
-      $href=$this->uri.($rel === '' ? '/': str_replace('%2F', '/', rawurlencode($rel)));
-      echo '<D:response><D:href>'.htmlspecialchars($href,ENT_XML1).'</D:href><D:propstat><D:prop>';
-      echo '<D:displayname>'.htmlspecialchars(basename($f),ENT_XML1).'</D:displayname>';
-      echo '<D:getlastmodified>'.gmdate('D, d M Y H:i:s T',filemtime($f)).'</D:getlastmodified>';
-      echo '<D:creationdate>'.gmdate('Y-m-d\\TH:i:s\\Z',filectime($f)).'</D:creationdate>';
+      $rel = str_replace('\\','/',substr($f,strlen(S_PATH)));
+      $href = $this->uri.($rel === '' ? '/': str_replace('%2F', '/', rawurlencode($rel)));
+      echo '<D:response><D:href>'.htmlspecialchars($href, ENT_XML1).'</D:href><D:propstat><D:prop>';
+      echo '<D:displayname>'.htmlspecialchars(basename($f), ENT_XML1).'</D:displayname>';
+      echo '<D:getlastmodified>'.gmdate('D, d M Y H:i:s T', filemtime($f)).'</D:getlastmodified>';
+      echo '<D:creationdate>'.gmdate('Y-m-d\\TH:i:s\\Z', filectime($f)).'</D:creationdate>';
       if(is_dir($f)) {
         echo '<D:resourcetype><D:collection/></D:resourcetype>';
         echo '<D:getcontentlength/>';
@@ -918,7 +929,7 @@ class Dav {
         echo '<D:resourcetype/>';
         echo '<D:getcontentlength>'.filesize($f).'</D:getcontentlength>';
         echo '<D:getcontenttype>'.$this->mime($f).'</D:getcontenttype>';
-        echo '<D:getetag>"'.hash_file('md5',$f).'"</D:getetag>';
+        echo '<D:getetag>"'.hash_file('md5', $f).'"</D:getetag>';
       }
       echo '<D:supportedlock><D:lockentry><D:lockscope><D:exclusive/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry><D:lockentry><D:lockscope><D:shared/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry></D:supportedlock>';
       echo '<D:lockdiscovery/>';
@@ -1122,7 +1133,7 @@ class Dav {
       :root{--bg-g:linear-gradient(135deg, #e0f7fa 0%, #fce4ec 100%);--bg:rgba(255,255,255,0.94);--tx:#263238;--bd:#cfd8dc;--hv:#f5f7fa;--p:#5c6bc0;--pd:#3949ab;--ac:#26a69a;--er:#ef5350;--wa:#fb8c00;--sh:0 12px 32px -8px rgba(0,0,0,0.08);}
       .dark{--bg-g:linear-gradient(135deg, #1a1c29 0%, #25273c 100%);--bg:rgba(30,32,42,0.96);--tx:#b0b8c4;--bd:#374151;--hv:#262a36;--p:#818cf8;--pd:#6366f1;--ac:#4ade80;--er:#f87171;--wa:#fbbf24;--sh:0 12px 32px -8px rgba(0,0,0,0.4);}
       body{margin:0;font-family:'Segoe UI',system-ui,-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;background:var(--bg-g);color:var(--tx);min-height:100vh;background-attachment:fixed;display:flex;justify-content:center;align-items:start;padding-top:30px;box-sizing:border-box;line-height:1.6}
-      .box{width:96%;max-width:1120px;min-height:85vh;background:var(--bg);border-radius:20px;box-shadow:var(--sh);border:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;backdrop-filter:blur(20px);transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
+      .box{width:96%;max-width:1200px;min-height:85vh;background:var(--bg);border-radius:20px;box-shadow:var(--sh);border:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;backdrop-filter:blur(20px);transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
       header{padding:12px 20px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.4);flex-shrink:0;backdrop-filter:blur(12px)}
       .dark header{background:rgba(30,32,42,0.4)}
       .nav-input{background:transparent;border:1px solid transparent;color:var(--tx);font-size:15px;font-weight:500;width:300px;padding:6px 10px;border-radius:6px;transition:all 0.2s}
