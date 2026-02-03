@@ -1123,7 +1123,7 @@ class Dav {
       .btn:hover{border-color:var(--p);color:var(--p);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
       .bp{background:var(--p);color:#fff;border:none}
       .bp:hover{background:var(--pd);color:#fff;transform:translateY(-1px);box-shadow:0 4px 14px rgba(92,107,192,0.3)}
-      .bd{color:var(--er);border-color:transparent}
+      .bd{color:var(--er);} /**border-color:transparent}**/
       .bd:hover{background:var(--er);color:#fff}
       .btn-group{display:flex;align-items:center;box-shadow:0 2px 4px rgba(0,0,0,0.04);border-radius:6px;overflow:hidden}
       .btn-group .btn{border-radius:0;margin:0;box-shadow:none;border-right:1px solid rgba(255,255,255,0.2)}
@@ -1202,7 +1202,7 @@ class Dav {
         </div>
         <div style="display:flex;gap:14px;align-items:center">
           <?php if(LOG_ENABLED): ?><a href="#" onclick="showLogs()" class="ab" title="<?= T('log_title') ?>" style="padding:8px"><?= $ICONS['log'] ?></a><?php endif; ?>
-          <?php if($isAdmin): ?><a href="#" onclick="showUsers()" class="ab" title="<?=T('user_m')?>" style="padding:8px"><?=$ICONS['user']?></a><?php endif; ?>
+          <?php global $u, $isAdmin; if($isAdmin): ?><a href="#" onclick="showUsers()" class="ab" title="<?=T('user_m')?>" style="padding:8px"><?=$ICONS['user']?></a><?php endif; ?>
           <button class="tg" onclick="mode()">
             <svg class="float-icon" width="24" height="24" viewBox="0 0 24 24" fill="#FDB813">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -1218,7 +1218,7 @@ class Dav {
         </div>
       </header>
       <div class="bar">
-        <?php if($this->req!=='/'): $pp=array_filter(explode('/',$this->req)); array_pop($pp); ?>
+        <?php global $u, $isAdmin; if($this->req!=='/'): $pp=array_filter(explode('/',$this->req)); array_pop($pp); ?>
         <a href="<?=$this->uri.'/'.implode('/',array_map('rawurlencode',$pp))?>" class="btn"><?= T('back') ?></a>
         <?php endif;?>
         <form method="post" enctype="multipart/form-data" style="margin:0;display:flex">
@@ -1259,7 +1259,7 @@ class Dav {
             </tr>
           </thead>
           <tbody>
-            <?php if(count($l)<=2): ?><tr>
+            <?php global $u, $isAdmin; if(count($l)<=2): ?><tr>
               <td colspan="5" class="emp-msg"><?= T('emp') ?></td>
             </tr>
             <?php
@@ -1311,7 +1311,7 @@ class Dav {
         </div>
       </div>
     </div>
-<?php if(LOG_ENABLED): ?>
+<?php global $u, $isAdmin; if(LOG_ENABLED): ?>
     <div id="logModal" class="mod" style="display:none">
       <div class="mb" style="max-width:800px">
         <h3 style="margin-top:0;display:flex;justify-content:space-between;align-items:center">
@@ -1328,7 +1328,7 @@ class Dav {
         </h3>
         <div style="max-height:400px;overflow-y:auto;background:rgba(0,0,0,0.03);border-radius:10px;padding:16px;margin-top:16px">
           <pre style="margin:0;font-size:12px;line-height:1.5;color:var(--tx)">
-<?php if(LOG_ENABLED) {
+<?php global $u, $isAdmin; if(LOG_ENABLED) {
   $log_file = LOG_PATH . '/' . date('Y-m-d') . '.log';
   echo htmlspecialchars(file_exists($log_file) ? file_get_contents($log_file) : 'No logs today.')
 ;} ?>
@@ -1336,10 +1336,10 @@ class Dav {
         </div>
       </div>
     </div>
-<?php endif; ?>
+<?php endif; global $u, $isAdmin; ?>
     <input id="q_lnk" value="" hidden>
     <script>
-      const $ = i => document.getElementById(i), csrf='<?=$csrf?>', cur='<?=$this->req?>', base='<?= BASE ?>';
+      const $= i => document.getElementById(i), csrf='<?=$csrf?>', cur='<?=$this->req?>', base='<?= BASE ?>';
 
       function showToast(msg) {
         const t = document.createElement('div');
@@ -1372,10 +1372,10 @@ class Dav {
           const isAdmin = user === admin;
           h += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--bd)"><span>${user}${user===currentUser?' <span style="color:var(--p)">(<?=T('user_current')?>)</span>':''}${isAdmin?' <span class="badge ok">Admin</span>':''}</span><div>`;
           if(!isAdmin){
-            h += `<button class="ab" onclick="userAction('chpass','${user}')" title="<?=T('user_chpass')?>"><?= $ICONS['ed'] ?></button>`;
-            h += `<button class="ab" onclick="userAction('setadmin','${user}')" title="<?=T('user_admin')?>"><?= $ICONS['user'] ?></button>`;
+            h += `<button class="ab" onclick="userAction('chpass','${user}')" title="<?= T('user_chpass') ?>"><?= $ICONS['ed'] ?></button>`;
+            h += `<button class="ab" onclick="userAction('setadmin','${user}')" title="<?= T('user_admin') ?>"><?= $ICONS['user'] ?></button>`;
             if(user !== currentUser){
-              h += `<button class="ab del" onclick="userAction('delete','${user}')" title="<?=T('user_del')?>"><?= $ICONS['delete'] ?></button>`;
+              h += `<button class="ab del" onclick="userAction('delete','${user}')" title="<?= T('user_del') ?>"><?= $ICONS['rm'] ?></button>`;
             }
           }
           h += '</div></div>';
