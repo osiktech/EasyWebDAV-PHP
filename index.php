@@ -666,21 +666,30 @@ class Dav {
 
   public function handleBrowser() {
     $this->chk(); global $u, $isAdmin;
-    log_action('DEBUG', 'isAdmin: '. $isAdmin);
     if(isset($_FILES['f'])) {
       $file_ary = $_FILES['f'];
       $file_count = is_array($file_ary['name']) ? count($file_ary['name']) : 1;
 
       for($i=0; $i<$file_count; $i++) {
-        $n = is_array($file_ary['name']) ? $file_ary['name'][$i] : $file_ary['name'];
-        $tmp = is_array($file_ary['tmp_name']) ? $file_ary['tmp_name'][$i] : $file_ary['tmp_name'];
         $err = is_array($file_ary['error']) ? $file_ary['error'][$i] : $file_ary['error'];
 
-        if($err === UPLOAD_ERR_OK && !$this->isDenied($n)) {
-          $target = $this->path.'/'.$n;
+        if($err !== UPLOAD_ERR_OK) continue;
+
+        $n = is_array($file_ary['name']) ? $file_ary['name'][$i] : $file_ary['name'];
+        $tmp = is_array($file_ary['tmp_name']) ? $file_ary['tmp_name'][$i] : $file_ary['tmp_name'];
+        $full_path = is_array($file_ary['full_path']) ? $file_ary['full_path'][$i] : $n;
+
+        if(!$this->isDenied($n)) {
+          $target = $this->path . '/' . $full_path;
+          $target_dir = dirname($target);
+
+          if (!is_dir($target_dir)) {
+              mkdir($target_dir, 0755, true);
+          }
+
           if(move_uploaded_file($tmp, $target)) {
-            @chmod($target, 0644);
-            log_action('UPLOAD', 'File: '.$n, $u);
+              @chmod($target, 0644);
+              log_action('UPLOAD', 'File: '.$full_path, $u);
           }
         }
       }
