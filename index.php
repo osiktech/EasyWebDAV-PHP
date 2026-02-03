@@ -550,7 +550,7 @@ if(isset($_GET['log_action'])) {
 
 $dav = new Dav();
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
-  if(isset($_FILES['f']) || isset($_POST['md']) || isset($_POST['act']) || isset($_POST['s_act'])) $dav->handleBrowser();
+  if(isset($_FILES['f']) || isset($_POST['md']) || isset($_POST['act']) || isset($_POST['s_act']) || isset($_POST['user_act'])) $dav->handleBrowser();
   else $dav->serve();
 } else $dav->serve();
 
@@ -1138,7 +1138,7 @@ class Dav {
       .lnk:hover{color:var(--p)}
       .i{width:20px;height:20px;color:#78909c}
       .acts{display:flex;gap:6px;justify-content:flex-end}
-      .ab{padding:6px;border:none;background:0 0;cursor:pointer;color:#78909c;border-radius:6px;display:flex;transition:all 0.2s}
+      .ab{padding:6px;border:none;background:0 0;cursor:pointer;color:#78909c;border-radius:6px;display:flex;transition:all 0.2s;float:left;}
       .ab:hover{background:#e8eaf6;color:var(--p);transform:translateY(-1px)}
       .dark .ab:hover{background:rgba(121,134,203,0.2)}
       .ab svg{width:16px;height:16px}
@@ -1218,7 +1218,7 @@ class Dav {
         </div>
       </header>
       <div class="bar">
-        <?php global $u, $isAdmin; if($this->req!=='/'): $pp=array_filter(explode('/',$this->req)); array_pop($pp); ?>
+        <?php if($this->req!=='/'): $pp=array_filter(explode('/',$this->req)); array_pop($pp); ?>
         <a href="<?=$this->uri.'/'.implode('/',array_map('rawurlencode',$pp))?>" class="btn"><?= T('back') ?></a>
         <?php endif;?>
         <form method="post" enctype="multipart/form-data" style="margin:0;display:flex">
@@ -1259,7 +1259,7 @@ class Dav {
             </tr>
           </thead>
           <tbody>
-            <?php global $u, $isAdmin; if(count($l)<=2): ?><tr>
+            <?php if(count($l)<=2): ?><tr>
               <td colspan="5" class="emp-msg"><?= T('emp') ?></td>
             </tr>
             <?php
@@ -1311,7 +1311,7 @@ class Dav {
         </div>
       </div>
     </div>
-<?php global $u, $isAdmin; if(LOG_ENABLED): ?>
+<?php if(LOG_ENABLED): ?>
     <div id="logModal" class="mod" style="display:none">
       <div class="mb" style="max-width:800px">
         <h3 style="margin-top:0;display:flex;justify-content:space-between;align-items:center">
@@ -1328,7 +1328,7 @@ class Dav {
         </h3>
         <div style="max-height:400px;overflow-y:auto;background:rgba(0,0,0,0.03);border-radius:10px;padding:16px;margin-top:16px">
           <pre style="margin:0;font-size:12px;line-height:1.5;color:var(--tx)">
-<?php global $u, $isAdmin; if(LOG_ENABLED) {
+<?php if(LOG_ENABLED) {
   $log_file = LOG_PATH . '/' . date('Y-m-d') . '.log';
   echo htmlspecialchars(file_exists($log_file) ? file_get_contents($log_file) : 'No logs today.')
 ;} ?>
@@ -1336,7 +1336,7 @@ class Dav {
         </div>
       </div>
     </div>
-<?php endif; global $u, $isAdmin; ?>
+<?php endif; ?>
     <input id="q_lnk" value="" hidden>
     <script>
       const $= i => document.getElementById(i), csrf='<?=$csrf?>', cur='<?=$this->req?>', base='<?= BASE ?>';
@@ -1358,6 +1358,7 @@ class Dav {
         if($('logModal')) $('logModal').style.display='flex';
       }
 
+<?php global $u, $isAdmin; if ($isAdmin): $ac = loadAuthData(); ?>
       function showUsers(){
         $('md').style.display='flex';
         $('mb_cnt').className='mb';
@@ -1413,7 +1414,7 @@ class Dav {
           }
         }
       }
-
+<?php endif; ?>
       function cl() {
         $('md').style.display='none';
         if($('logModal')) $('logModal').style.display='none';
