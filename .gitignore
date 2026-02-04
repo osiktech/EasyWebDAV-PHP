@@ -1,0 +1,5 @@
+/storage
+/logs
+.htaccess
+.htpasswd.php
+.shares.php
